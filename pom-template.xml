@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <packaging>jar</packaging>
   <groupId>io.github.clojure-quant</groupId>
-  <artifactId>quanta-market</artifactId>
-  <name>quanta-market</name>
+  <artifactId>quanta-bar-warehouse</artifactId>
+  <name>quanta-bar-warehouse</name>
   <licenses>
     <license>
       <name>Eclipse Public License</name>
@@ -17,8 +17,8 @@
     </developer>
   </developers>
   <scm>
-    <url>https://github.com/clojure-quant/quanta-market/</url>
-    <connection>scm:git:git://github.com/clojure-quant/quanta-market.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/clojure-quant/quanta-market.git</developerConnection>
+    <url>https://github.com/clojure-quant/quanta-bar-warehouse/</url>
+    <connection>scm:git:git://github.com/clojure-quant/quanta-bar-warehouse.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/clojure-quant/quanta-bar-warehouse.git</developerConnection>
   </scm>
 </project>
