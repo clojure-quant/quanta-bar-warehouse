@@ -53,13 +53,11 @@ db
 (b/get-bars db
             {:asset "ETHUSDT"  ; "USD/JPY"
              :calendar [:crypto :m15]}
-            {:start #inst "2024-07-01T01:00:00.000-00:00"
-             })
+            {:start #inst "2024-07-01T01:00:00.000-00:00"})
 
 (b/get-bars db
             {:asset "ETHUSDT"  ; "USD/JPY"
              :calendar [:crypto :m15]}
-            {:start (t/instant "2024-07-01T01:00:00.000-00:00")
-             })
+            {:start (t/instant "2024-07-01T01:00:00.000-00:00")})
 
 

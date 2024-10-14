@@ -21,9 +21,9 @@
 (def bardb-nippy
   (start-bardb-nippy ".data/nippy/"))
 
-(def secrets 
+(def secrets
   (-> "/home/florian/repo/myLinux/myvault/goldly/quanta.edn"
-      (slurp) 
+      (slurp)
       (edn/read-string)))
 
 (def bar-engine
@@ -49,13 +49,10 @@
                             })
                 :shuffle (start-transform-shuffle)}}))
 
-
-
 (def assets
   [; kibot
    {:name "EURUSD" :symbol "EUR/USD" :kibot "EURUSD" :category :fx}
    {:name "Microsoft" :symbol "MSFT" :kibot "MSFT" :category :equity}])
-
 
 (doall
  (map asset-db/add assets))

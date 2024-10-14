@@ -16,9 +16,18 @@ preloader
 - imports data once to the warehouse using bar-engine
 
 
-# unit tests
+## for developers
 
-```
-clj -M:test
-```
+### for development
+
+ start a nrepl-connection to the dev project.
+ in dev folder you will find plenty of namespaces to play with
+
+
+*code linter*  `clj -M:lint`
+
+*code formatter `clj -M:cljfmt-fix`
+
+*unit tests* `clj -M:test`
+
 

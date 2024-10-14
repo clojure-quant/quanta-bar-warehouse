@@ -22,6 +22,23 @@
                "--lint"
                "./src"]}
 
+  :cljfmt
+  {:extra-deps {cljfmt/cljfmt {:mvn/version "0.8.0"}}
+   :main-opts ["-m" "cljfmt.main"
+               "--indents" "cljfmt.edn"
+               "check"
+               "./src"
+               "./dev/src"]}
+
+  :cljfmt-fix
+  {:extra-deps {cljfmt/cljfmt {:mvn/version "0.8.0"}}
+   :main-opts ["-m" "cljfmt.main"
+               "--indents" "cljfmt.edn"
+               "fix"
+               "./src"
+               "./dev/src"]}
+
+
   :build {:deps {io.github.clojure/tools.build {:git/tag "v0.6.1" :git/sha "515b334"}
                  io.github.seancorfield/build-clj {:git/tag "v0.5.4" :git/sha "bc9c0cc"}}
           :ns-default build}}}

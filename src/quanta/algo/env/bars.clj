@@ -10,7 +10,6 @@
 
 (def ^:dynamic *bar-db* nil)
 
-
 (defn- get-asset [spec]
   (:asset spec))
 
@@ -19,7 +18,6 @@
 
 (defn- get-trailing-n [spec]
   (:trailing-n spec))
-
 
 (defn get-bars
   "returns bars for asset/calendar/window"

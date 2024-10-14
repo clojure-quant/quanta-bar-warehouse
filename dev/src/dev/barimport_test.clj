@@ -1,31 +1,26 @@
 (ns dev.barimport-test
-  (:require 
-    [tick.core :as t]
-    [ta.calendar.core :refer [trailing-range]]
-    [ta.db.bars.protocol :as b]
-    [dev.env :refer [bar-engine]]))
-
+  (:require
+   [tick.core :as t]
+   [ta.calendar.core :refer [trailing-range]]
+   [ta.db.bars.protocol :as b]
+   [dev.env :refer [bar-engine]]))
 
 (def dt (-> (t/instant)
-            (t/<< (t/new-duration 2 :days))
-            ))
+            (t/<< (t/new-duration 2 :days))))
 
 dt
 ;; => #time/instant "2024-10-08T23:12:45.290640436Z"
-
 
 (trailing-range [:us :d] 3  dt)
 ;; => {:end #time/zoned-date-time "2024-10-08T17:00-04:00[America/New_York]",
 ;;     :start #time/zoned-date-time "2024-10-04T17:00-04:00[America/New_York]"}
 
 (def w
-  (trailing-range [:us :d] 3  dt)
-  )
-
+  (trailing-range [:us :d] 3  dt))
 
 (b/get-bars bar-engine {:asset "AEE.AU"
-                :calendar [:us :d]
-                :import :eodhd}
+                        :calendar [:us :d]
+                        :import :eodhd}
             w)
 ;; => _unnamed [3 7]:
 ;;    
@@ -42,7 +37,6 @@ dt
 ;; => Execution error (ClassCastException) at cljc.java-time.local-date-time/is-before (local_date_time.clj:31).
 ;;    class java.time.ZonedDateTime cannot be cast to class java.time.chrono.ChronoLocalDateTime (java.time.ZonedDateTime and java.time.chrono.ChronoLocalDateTime are in module java.base of loader 'bootstrap')
 
-
 (b/get-bars bar-engine {:asset "BTCUSDT"
                         :calendar [:us :d]
                         :import :bybit}
@@ -56,7 +50,6 @@ dt
 ;;    | 2024-10-05T23:59:59Z | 62059.37 | 62983.78 | 61814.96 | 62824.80 |  9037.917928 |
 ;;    | 2024-10-06T23:59:59Z | 62824.80 | 64470.19 | 62115.15 | 62218.75 | 19762.195435 |
 ;;    | 2024-10-07T23:59:59Z | 62218.75 | 63202.67 | 61857.13 | 62156.22 | 20361.789732 |
-
 
 (b/get-bars bar-engine
             {:asset "EUR/USD" ; forex
@@ -91,10 +84,8 @@ dt
 ;;    | 2024-04-29T16:30-04:00[America/New_York] | 1.06909 | 1.07337 | 1.06901 | 1.07208 |  211949 |
 ;;    | 2024-04-30T16:30-04:00[America/New_York] | 1.07198 | 1.07354 | 1.06646 | 1.06654 |  200125 |
 
-
-
 (b/get-bars bar-engine
-            {:asset "QQQ" 
+            {:asset "QQQ"
              :calendar [:us :d]
              :import :eodhd}
             {:start (t/instant "2024-09-21T00:00:00Z")
@@ -110,10 +101,5 @@ dt
 ;;    | 2024-09-27T00:00:00Z | 490.50 | 490.64 | 485.56 | 486.75 |        486.7500 | 22851100 |
 ;;    | 2024-09-30T00:00:00Z | 485.78 | 488.41 | 482.92 | 488.07 |        488.0700 | 30281100 |
 
-
-
-
 (def window-daily
-  (trailing-range [:us :d] 2  dt)
-  
-  )
+  (trailing-range [:us :d] 2  dt))

@@ -13,7 +13,6 @@
 
 window-daily
 
-
 (b/get-bars db {:asset "AEE.AU"
                 :calendar [:us :d]
                 :import :eodhd}

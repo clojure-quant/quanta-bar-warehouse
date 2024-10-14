@@ -11,7 +11,6 @@
 
 (def db (modular.system/system :duckdb))
 
-
 (duck/delete-bars db [:crypto :d] "ETHUSDT")
 
 (remove-asset (:overview-db ddb) {:asset "ETHUSDT" :calendar [:crypto :d]})
