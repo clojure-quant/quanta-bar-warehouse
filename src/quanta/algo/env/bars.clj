@@ -4,7 +4,7 @@
    [de.otto.nom.core :as nom]
    [tick.core :as t]
    [tablecloth.api :as tc]
-   [ta.calendar.core :refer [trailing-window get-bar-window]]
+   [ta.calendar.core :refer [trailing-window #_get-bar-window]]
    [ta.db.bars.protocol :as b]
    [ta.db.bars.aligned :as aligned]))
 
