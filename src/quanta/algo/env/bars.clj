@@ -57,8 +57,11 @@
   (let [trailing-n (get-trailing-n spec)
         calendar (get-calendar spec)
         calendar-seq (trailing-window calendar trailing-n bar-close-date)
-        window (calendar-seq->window calendar-seq)]
-    (get-bars spec window)))
+        window (calendar-seq->window calendar-seq)
+        bar-ds (get-bars spec window)]
+    (if (= 0 (tc/row-count bar-ds))
+      (throw (ex-info "empty-bars" {:asset (get-asset spec) :n trailing-n :calendar calendar :dt bar-ds :window window}))
+      bar-ds)))
 
 #_(defn get-bars-lower-timeframe [env spec lower-timeframe]
     (let [calendar (get-calendar spec)
