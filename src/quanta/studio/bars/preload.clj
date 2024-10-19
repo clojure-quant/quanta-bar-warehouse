@@ -5,6 +5,7 @@
    [de.otto.nom.core :as nom]
    [tablecloth.api :as tc]
    [modular.system]
+   [quanta.calendar.core :refer [fixed-window]]
    [ta.db.bars.protocol :as b]
    [ta.db.bars.duckdb.delete :refer [delete-bars]]
    [ta.import.helper.retries :refer [with-retries]]))
@@ -16,7 +17,7 @@
    uses bar-engine
    same syntax as bar-engine, but additional:
    :to        one of :nippy :duckdb
-   :window    {:from :to} both instant or zoneddatetime
+   :window    {:from :to} both instant or zoneddatetime (values as bar close date times)
    :labelS    optional label for logging
    :retries   optional, number of retries to import bars."
   [bar-engine
@@ -45,7 +46,10 @@
         {:asset asset
          :count c
          :start (-> ds tc/first :date first)
-         :end (-> ds tc/last :date first)}))))
+         :end (-> ds tc/last :date first)
+         ;using fixed-window instead of fixed-window-open because importer should convert to bar close date time
+         :window-count (-> (fixed-window calendar window)
+                           count)}))))
 
 (defn import-bars-impl
   "imports bars from a bar-source to a bar-db.
