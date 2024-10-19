@@ -5,7 +5,9 @@
    [missionary.core :as m]
    [tablecloth.api :as tc]
    [ta.db.bars.protocol :as b]
+   [quanta.calendar.core :refer [fixed-window]]
    [ta.db.bars.duckdb.delete :refer [delete-bars]]
+
    [ta.import.helper.retries :refer [with-retries]]))
 
 ;; TODO: make delete a interface, so it works for nippy and duckdb.
@@ -36,9 +38,11 @@
                                   :calendar calendar
                                   :bardb to} ds)
        {:asset asset
-        :count c
         :start (-> ds tc/first :date first)
-        :end (-> ds tc/last :date first)})
+        :end (-> ds tc/last :date first)
+        :count c
+        ;using fixed-window instead of fixed-window-open because importer should convert to bar close date time
+        :window-count (-> (fixed-window calendar window) count)})
      (catch Exception ex
        (error "could not get bars for asset: " asset " error: " (ex-message ex))
        {:asset asset
@@ -84,7 +88,7 @@
            tasks (map make-task asset)
            result (m/? (run-tasks tasks parallel-nr))]
        (println "result for: " label result)
-       (print-table result)
+       (print-table [:asset :start :end :count :window-count] result)
        result))
     (import-bars-one bar-engine opts)))
 

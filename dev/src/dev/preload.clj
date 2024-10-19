@@ -31,6 +31,18 @@
             :end (t/instant "2024-09-10T00:00:00Z")}
    :label "test"}))
 
+(m/?
+ (import-bars
+  bar-engine
+  {:asset ["BTCUSDT" "ETHUSDT"]
+   :parallel-nr 100
+   :calendar [:crypto :h]
+   :import :bybit-parallel
+   :to :nippy
+   :window {:start (t/instant "2024-01-01T00:00:00Z")
+            :end (t/instant "2024-09-10T00:00:00Z")}
+   :label "test"}))
+
 ;; kibot
 ;; note that assets have to be in asset-db
 
