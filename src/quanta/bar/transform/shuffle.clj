@@ -1,5 +1,5 @@
 
-(ns quanta.studio.bars.transform.shuffle
+(ns quanta.bar.transform.shuffle
   (:require
    [de.otto.nom.core :as nom]
    [taoensso.timbre :as timbre :refer [debug info warn error]]

@@ -1,4 +1,4 @@
-(ns quanta.studio.bars.transform.dynamic.overview-db
+(ns quanta.bar.transform.dynamic.overview-db
   (:require
    [taoensso.timbre :as timbre :refer [info warn error]]
    [tick.core :as t]

@@ -1,11 +1,11 @@
-(ns quanta.studio.bars.transform.dynamic.import
+(ns quanta.bar.transform.dynamic.import
   (:require
    [taoensso.timbre :as timbre :refer [debug info warn error]]
    [tick.core :as t]
    [de.otto.nom.core :as nom]
    [ta.db.bars.protocol :as b]
-   [quanta.studio.bars.transform.dynamic.overview-db :as overview]
-   [quanta.studio.bars.transform.logger :as logger]))
+   [quanta.bar.transform.dynamic.overview-db :as overview]
+   [quanta.bar.transform.logger :as logger]))
 
 (defn- import-tasks-map [req-window db-window]
   {:db-empty (when (not db-window)

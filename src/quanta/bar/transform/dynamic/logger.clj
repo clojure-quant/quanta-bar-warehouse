@@ -1,4 +1,4 @@
-(ns quanta.studio.bars.transform.dynamic.logger
+(ns quanta.bar.transform.dynamic.logger
   (:require
    [taoensso.timbre :as timbre :refer [debug info warn error]]))
 

@@ -1,4 +1,4 @@
-(ns quanta.studio.bars.transform.compress
+(ns quanta.bar.transform.compress
   (:require
    [taoensso.timbre :as timbre :refer [debug info warn error]]
    [de.otto.nom.core :as nom]

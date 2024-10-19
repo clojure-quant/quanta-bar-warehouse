@@ -1,23 +1,20 @@
-(ns quanta.notebook.docs.import-manager
+(ns dev.bar-engine
   (:require
    [tick.core :as t]
+   [missionary.core :as m]
    [ta.db.bars.protocol :as b]
-   [modular.system]))
-
-(def im (modular.system/system :import-manager))
-
-; im
-; dont show import-manager state, as it contains passwords / credentials.
+   [dev.env :refer [bar-engine]]))
 
 (def dt (t/instant "2024-05-01T00:00:00Z"))
 dt
 
 ;; BYBIT
-(b/get-bars im {:asset "ETHUSDT" ; crypto
-                :calendar [:crypto :m]
-                :import :bybit}
-            {:start  (t/instant "2024-05-01T00:00:00Z")
-             :end (t/instant "2024-07-01T00:00:00Z")})
+(m/? (b/get-bars
+      bar-engine {:asset "ETHUSDT" ; crypto
+                  :calendar [:crypto :m]
+                  :import :bybit-parallel}
+      {:start  (t/instant "2024-05-01T00:00:00Z")
+       :end (t/instant "2024-07-01T00:00:00Z")}))
 
 ;; ALPHAVANTAGE
 (b/get-bars im {:asset "FMCDX" ; mutual fund
