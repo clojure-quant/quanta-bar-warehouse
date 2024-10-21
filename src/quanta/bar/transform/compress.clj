@@ -5,7 +5,7 @@
    [missionary.core :as m]
    [tablecloth.api :as tc]
    [ta.calendar.validate :as cal]
-   [ta.calendar.compress :refer [compress-to-calendar]]
+   [quanta.calendar.compress :refer [compress-to-calendar]]
    [ta.db.bars.protocol :refer [barsource] :as b]))
 
 (defn get-source-interval [interval-config interval]
