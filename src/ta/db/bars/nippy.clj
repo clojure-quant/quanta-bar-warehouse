@@ -18,7 +18,7 @@
 (defn load-ds [filename]
   (let [s (io/gzip-input-stream filename)
         ds (io/get-nippy s)]
-    (debug "loaded series " name " count: " (tc/row-count ds))
+    (debug "loaded series " filename " count: " (tc/row-count ds))
     ds))
 
 (defn filename-asset [this {:keys [asset calendar]}]

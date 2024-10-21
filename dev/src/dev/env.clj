@@ -2,16 +2,17 @@
   (:require
    [clojure.edn :as edn]
    ;; asset db
-   [ta.db.asset.db :as asset-db]
+   [quanta.market.asset.db :as asset-db]
    ; bardb
    [ta.db.bars.nippy :refer [start-bardb-nippy]]
    ;; imports
    [quanta.market.barimport.bybit.import :refer [create-import-bybit]]
    [quanta.market.barimport.bybit.import-parallel :refer [create-import-bybit-parallel]]
-   [ta.import.provider.kibot.ds :refer [create-import-kibot]]
-   [ta.import.provider.kibot-http.ds :refer [create-import-kibot-http]]
-   [ta.import.provider.eodhd.ds :refer [create-import-eodhd]]
-   [ta.import.provider.alphavantage.ds :refer [create-import-alphavantage]]
+   [quanta.market.barimport.kibot.api :refer [create-import-kibot]]
+   [quanta.market.barimport.kibot.http :refer [create-import-kibot-http]]
+   [quanta.market.asset.load :refer [add-lists-to-db]]
+   ;[ta.import.provider.eodhd.ds :refer [create-import-eodhd]]
+   ;[ta.import.provider.alphavantage.ds :refer [create-import-alphavantage]]
    ;; bar-engine
    [quanta.bar.engine :refer [start-bar-engine]]
    ; transform
@@ -31,8 +32,8 @@
    {:bardb {:nippy bardb-nippy}
     :import {:kibot (create-import-kibot (:kibot secrets))
              :kibot-http (create-import-kibot-http (:kibot secrets))
-             :eodhd (create-import-eodhd (:eodhd secrets))
-             :alphavantage (create-import-alphavantage (:alphavantage secrets))
+             ;:eodhd (create-import-eodhd (:eodhd secrets))
+             ;:alphavantage (create-import-alphavantage (:alphavantage secrets))
              :bybit (create-import-bybit)
              :bybit-parallel (create-import-bybit-parallel)}
     :transform {:compress (start-transform-compress
@@ -55,8 +56,10 @@
    {:name "USDJPY" :symbol "USD/JPY" :kibot "USDJPY" :category :fx}
    {:name "Microsoft" :symbol "MSFT" :kibot "MSFT" :category :equity}])
 
-(doall
- (map asset-db/add assets))
+#_(doall
+   (map asset-db/add assets))
+
+(add-lists-to-db)
 
 (asset-db/instrument-details "EUR/USD")
 

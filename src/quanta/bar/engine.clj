@@ -11,9 +11,9 @@
      (cond
        transform
        (if-let [bar-transformer (get transforms transform)]
-         (b/get-bars bar-transformer (-> opts
-                                         (dissoc :transform)
-                                         (assoc :engine this)) window)
+         (m/? (b/get-bars bar-transformer (-> opts
+                                              (dissoc :transform)
+                                              (assoc :engine this)) window))
          (throw (ex-info "unknown-transform" {:transform transform
                                               :opts opts
                                               :window window})))
@@ -26,7 +26,7 @@
                                              :window window})))
        bardb
        (if-let [bardb (get dbs bardb)]
-         (b/get-bars bardb (dissoc opts :import :bardb :transform) window)
+         (m/? (b/get-bars bardb (dissoc opts :import :bardb :transform) window))
          (throw (ex-info "unknown-bardb" {:import import
                                           :opts opts
                                           :window window})))
@@ -39,6 +39,21 @@
       (b/append-bars db (dissoc opts :import :bardb :transform) bar-ds)
       (throw (ex-info "unknown-bardb" {:bardb bardb
                                        :opts opts})))))
+
+(defrecord bar-task [base]
+  barsource
+  (get-bars [_ opts window]
+    (m/sp
+     (b/get-bars base opts window)))
+  bardb
+  (append-bars [_ opts bar-ds]
+    (b/append-bars base opts bar-ds)))
+
+(defn wrap-task [feeds]
+  (->> feeds
+       (map (fn [[k v]]
+              [k (bar-task. v)]))
+       (into {})))
 
 (defn start-bar-engine
   "implements barsource and bardb protocols to load and save bars.
@@ -55,4 +70,6 @@
         (count import) " importers"
         (count bardb) " dbs"
         (count transform) " transformers")
-  (bar-engine. import bardb transform))
+  (bar-engine. import (wrap-task bardb) transform))
+
+

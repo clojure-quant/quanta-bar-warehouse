@@ -2,6 +2,7 @@
   (:require
    [taoensso.timbre :as timbre :refer [debug info warn error]]
    [de.otto.nom.core :as nom]
+   [missionary.core :as m]
    [tablecloth.api :as tc]
    [ta.calendar.validate :as cal]
    [ta.calendar.compress :refer [compress-to-calendar]]
@@ -31,35 +32,36 @@
 (defrecord transform-compressing [interval-config]
   barsource
   (get-bars [this opts window]
-    (info "get-bars " (select-keys opts [:task-id :asset :calendar :import])
-          " window: " (select-keys window [:start :end]))
-    (let [calendar  (:calendar opts)
-          market (cal/exchange calendar)
-          interval (cal/interval calendar)
-          interval-source (get-source-interval (:interval-config this) interval)]
-      (if interval-source
-        (let [calendar-source [market interval-source]
-              opts-source (assoc opts :calendar calendar-source)
-              engine (:engine opts)
-              opts-source-clean (dissoc opts-source :engine)
-              _ (warn "compressing [" interval-source "=> " interval "] opts: " (select-keys opts-source [:task-id :asset :calendar :import]))
-              ds-higher (b/get-bars engine opts-source-clean window)]
-          (cond
-            (not ds-higher)
-            (nom/fail ::compress {:message "cannot compress dataset, ds-higher is nil"
-                                  :opts opts
-                                  :range window})
+    (m/sp
+     (info "get-bars " (select-keys opts [:task-id :asset :calendar :import])
+           " window: " (select-keys window [:start :end]))
+     (let [calendar  (:calendar opts)
+           market (cal/exchange calendar)
+           interval (cal/interval calendar)
+           interval-source (get-source-interval (:interval-config this) interval)]
+       (if interval-source
+         (let [calendar-source [market interval-source]
+               opts-source (assoc opts :calendar calendar-source)
+               engine (:engine opts)
+               opts-source-clean (dissoc opts-source :engine)
+               _ (warn "compressing [" interval-source "=> " interval "] opts: " (select-keys opts-source [:task-id :asset :calendar :import]))
+               ds-higher (m/? (b/get-bars engine opts-source-clean window))]
+           (cond
+             (not ds-higher)
+             (nom/fail ::compress {:message "cannot compress dataset, ds-higher is nil"
+                                   :opts opts
+                                   :range window})
 
-            (nom/anomaly? ds-higher)
-            ds-higher
+             (nom/anomaly? ds-higher)
+             ds-higher
 
-            :else
-            (run-compress-safe ds-higher calendar opts window)))
-        (do
-          (warn "no compression for: " interval " - forwarding request to bar-engine ")
-          (let [engine (:engine opts)
-                opts-clean (dissoc opts :engine)]
-            (b/get-bars engine opts-clean window)))))))
+             :else
+             (run-compress-safe ds-higher calendar opts window)))
+         (do
+           (warn "no compression for: " interval " - forwarding request to bar-engine ")
+           (let [engine (:engine opts)
+                 opts-clean (dissoc opts :engine)]
+             (m/? (b/get-bars engine opts-clean window)))))))))
 
 (defn start-transform-compress [interval-config]
   (assert (not (nil? interval-config)) "interval-config needs to be a map. currently it is nil.")
