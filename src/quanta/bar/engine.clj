@@ -72,19 +72,14 @@
         (count transform) " transformers")
   (bar-engine. import (wrap-task bardb) transform))
 
-(defn start-bar-engine-old
-  "implements barsource and bardb protocols to load and save bars.
-   depending of the following extra keys in :opts the action is different:
-   :import import bars from a bar-import feed.
-   :bardb loads bars from a bar-db
-   :transform this works together with :import and :bardb and 
-   applies a transformation, like :compress :dynamic or :shuffle"
-  [{:keys [import bardb transform]
-    :or {import {}
-         bardb {}
-         transform {}}}]
-  (info "starting bar-loader with "
-        (count import) " importers"
-        (count bardb) " dbs"
-        (count transform) " transformers")
-  (bar-engine. import bardb transform))
+(defrecord bar-engine-sync [base]
+  barsource
+  (get-bars [_ opts window]
+    (m/?
+     (b/get-bars base opts window)))
+  bardb
+  (append-bars [_ opts bar-ds]
+    (b/append-bars base opts bar-ds)))
+
+(defn create-engine-sync [bar-engine]
+  (bar-engine-sync. bar-engine))
