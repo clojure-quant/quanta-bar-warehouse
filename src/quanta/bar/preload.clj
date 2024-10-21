@@ -8,7 +8,6 @@
    [quanta.calendar.core :refer [fixed-window]]
    [quanta.market.barimport.bybit.normalize-request :refer [window->open-time]]
    [ta.db.bars.duckdb.delete :refer [delete-bars]]
-
    [ta.import.helper.retries :refer [with-retries]]))
 
 ;; TODO: make delete a interface, so it works for nippy and duckdb.

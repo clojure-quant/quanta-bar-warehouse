@@ -117,7 +117,6 @@
                 :end (t/instant "2024-10-21T00:00:00Z")}
        :label "bar compression"}))
 
-
 (m/?
  (b/get-bars bar-engine
              {:asset "EUR/USD"
