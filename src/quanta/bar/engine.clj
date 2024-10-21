@@ -72,7 +72,6 @@
         (count transform) " transformers")
   (bar-engine. import (wrap-task bardb) transform))
 
-
 (defn start-bar-engine-old
   "implements barsource and bardb protocols to load and save bars.
    depending of the following extra keys in :opts the action is different:
