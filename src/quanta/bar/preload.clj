@@ -6,6 +6,7 @@
    [tablecloth.api :as tc]
    [ta.db.bars.protocol :as b]
    [quanta.calendar.core :refer [fixed-window]]
+   [quanta.market.barimport.bybit.normalize-request :refer [window->open-time]]
    [ta.db.bars.duckdb.delete :refer [delete-bars]]
 
    [ta.import.helper.retries :refer [with-retries]]))
@@ -42,7 +43,9 @@
         :end (-> ds tc/last :date first)
         :count c
         ;using fixed-window instead of fixed-window-open because importer should convert to bar close date time
-        :window-count (-> (fixed-window calendar window) count)})
+        :window-count (->> (window->open-time window calendar)
+                           (fixed-window calendar)
+                           count)})
      (catch Exception ex
        (error "could not get bars for asset: " asset " error: " (ex-message ex))
        {:asset asset
