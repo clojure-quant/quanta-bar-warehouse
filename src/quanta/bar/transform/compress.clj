@@ -6,12 +6,8 @@
    [tablecloth.api :as tc]
    [ta.calendar.validate :as cal]
    [quanta.calendar.compress :refer [compress-to-calendar]]
-   [ta.db.bars.protocol :refer [barsource] :as b]))
-
-(defn get-source-interval [interval-config interval]
-  (let [source-interval (get interval-config interval)]
-    (info "requested interval: " interval "source interval: " source-interval)
-    source-interval))
+   [ta.db.bars.protocol :refer [barsource] :as b]
+   [quanta.bar.transform.helper :refer [get-source-interval]]))
 
 (defn run-compress-safe [ds-higher calendar opts window]
   (info "compressing "  " bars to calendar: " calendar) ; (count ds-higher)
