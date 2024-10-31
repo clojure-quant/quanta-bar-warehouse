@@ -17,7 +17,8 @@
    [quanta.bar.engine :refer [start-bar-engine]]
    ; transform
    [quanta.bar.transform.compress :refer [start-transform-compress]]
-   [quanta.bar.transform.shuffle :refer [start-transform-shuffle]]))
+   [quanta.bar.transform.shuffle :refer [start-transform-shuffle]]
+   [quanta.bar.transform.append-only :refer [start-transform-append-only]]))
 
 (def bardb-nippy
   (start-bardb-nippy ".data/nippy/"))
@@ -26,6 +27,19 @@
   (-> (str (System/getenv "MYVAULT") "/quanta.edn")
       (slurp)
       (edn/read-string)))
+
+(def interval-config
+  {; we just request daily and minute bars, the rest gets calculated.
+   :Y :d
+   :M :d
+   :W :d
+   ;:d :d ; use daily from source.
+   :h :m
+   :m30 :m
+   :m15 :m
+   :m5 :m
+   ;:m :m ; use minute from source.
+   })
 
 (def bar-engine
   (start-bar-engine
@@ -36,19 +50,9 @@
              ;:alphavantage (create-import-alphavantage (:alphavantage secrets))
              :bybit (create-import-bybit)
              :bybit-parallel (create-import-bybit-parallel)}
-    :transform {:compress (start-transform-compress
-                           {; we just request daily and minute bars, the rest gets calculated.
-                            :Y :d
-                            :M :d
-                            :W :d
-                            ;:d :d ; use daily from source.
-                            :h :m
-                            :m30 :m
-                            :m15 :m
-                            :m5 :m
-                            ;:m :m ; use minute from source.
-                            })
-                :shuffle (start-transform-shuffle)}}))
+    :transform {:compress (start-transform-compress interval-config)
+                :shuffle (start-transform-shuffle)
+                :append-only (start-transform-append-only interval-config)}}))
 
 (def assets
   [; kibot

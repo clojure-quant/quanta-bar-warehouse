@@ -21,6 +21,11 @@
     (debug "loaded series " filename " count: " (tc/row-count ds))
     ds))
 
+(defn append-ds [filename ds]
+  (let [existing-ds (load-ds filename)]
+    (debug "appending series " filename " count:" (tc/row-count ds) ", existing:" (tc/row-count existing-ds))
+    (save-ds filename (tc/concat existing-ds ds))))
+
 (defn filename-asset [this {:keys [asset calendar]}]
   (let [[exchange interval] calendar
         asset (str/replace asset #"/" "_")]
@@ -48,7 +53,11 @@
   bardb
   (append-bars [this opts ds-bars]
     ;(info "this: " this)
-    (save-ds (filename-asset this opts) ds-bars)))
+    (case (:write-mode opts)
+      :append
+      (append-ds (filename-asset this opts) ds-bars)
+
+      (save-ds (filename-asset this opts) ds-bars))))
 
 (defn start-bardb-nippy [base-path]
   (debug "creating dir: " base-path)
