@@ -52,6 +52,7 @@
   6) ds is empty                                                    => append whole window
 
   NOTE: expects window with bar close time!
+  returns a window or nil if no bar is missing
   "
   [ds calendar window]
   (if (tc/empty-ds? ds)
@@ -65,12 +66,13 @@
 (defn aligned-window
   "align window to other timeframe"
   [calendar {:keys [start end] :as window}]
-  (let [aligned-start-dt (current-close calendar start)
-        aligned-end-dt (current-close calendar end)]
-    (when (and (t/>= aligned-start-dt start) (t/<= aligned-start-dt end)
-               (t/>= aligned-end-dt start) (t/<= aligned-end-dt end))
-      {:start aligned-end-dt
-       :end aligned-end-dt})))
+  (when window
+    (let [aligned-start-dt (current-close calendar start)
+          aligned-end-dt (current-close calendar end)]
+      (when (and (t/>= aligned-start-dt start) (t/<= aligned-start-dt end)
+                 (t/>= aligned-end-dt start) (t/<= aligned-end-dt end))
+        {:start aligned-end-dt
+         :end aligned-end-dt}))))
 
 (defrecord transform-append-only [interval-config]
   barsource
@@ -102,8 +104,8 @@
                      aligned-import-window (aligned-window calendar import-window)]
                   ; if aligned-import-window is nil, then no need to import and compress source bars
                  (when aligned-import-window
-                   (let [imported-source-ds (m/? (import-bars opts-source import-window))
-                         _ (append-bars opts-source imported-source-ds)]))
+                   (let [imported-source-ds (m/? (import-bars opts-source import-window))]
+                     (append-bars opts-source imported-source-ds)))
                  (m/? (load-and-compress-bars opts window)))
                (catch AssertionError ex
                  (error "append-only: interval:" interval opts window " exception: " ex))
@@ -113,9 +115,10 @@
            (info "append-only for" interval "- forwarding request to bar-engine")
            (try
              (let [stored-ds (m/? (load-stored-bars opts window))
-                   import-window (missing-bars-window stored-ds calendar window)
-                   imported-ds (m/? (import-bars opts import-window))
-                   _ (append-bars opts imported-ds)]
+                   import-window (missing-bars-window stored-ds calendar window)]
+               (when import-window
+                 (let [imported-ds (m/? (import-bars opts import-window))]
+                   (append-bars opts imported-ds)))
                (m/? (load-stored-bars opts window)))
              (catch AssertionError ex
                (error "append-only: assertion:" interval window opts " exception: " ex))
