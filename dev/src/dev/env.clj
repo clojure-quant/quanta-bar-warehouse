@@ -18,8 +18,7 @@
    ; transform
    [quanta.bar.transform.compress :refer [start-transform-compress]]
    [quanta.bar.transform.shuffle :refer [start-transform-shuffle]]
-   [quanta.bar.transform.append-only :refer [start-transform-append-only]]
-   ))
+   [quanta.bar.transform.append-only :refer [start-transform-append-only]]))
 
 (def bardb-nippy
   (start-bardb-nippy ".data/nippy/"))

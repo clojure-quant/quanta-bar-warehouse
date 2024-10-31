@@ -31,3 +31,15 @@ preloader
 *unit tests* `clj -M:test`
 
 
+## bardb types
+- duckdb
+- nippy
+
+
+
+## transform types
+- append-only
+- compress
+- dynamic
+- shuffle
+
