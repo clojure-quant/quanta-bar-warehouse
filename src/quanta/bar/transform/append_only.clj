@@ -49,7 +49,7 @@
   "
   [ds calendar window]
   (if (tc/empty-ds? ds)
-    [window]
+    window
     (let [last-dt (get-last-dt ds)
           post-window (when (t/> (:end window) last-dt)
                         {:start (next-close calendar last-dt)
