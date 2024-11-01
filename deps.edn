@@ -6,7 +6,7 @@
   techascent/tech.io {:mvn/version "4.31"}
   com.techascent/tmducken {:mvn/version "0.10.0-2"}
   ; quanta
-  io.github.clojure-quant/quanta {:mvn/version "0.4.898"}
+  io.github.clojure-quant/quanta {:mvn/version "0.4.899"}
   io.github.clojure-quant/quanta-market {:mvn/version "0.1.150"}}
  :aliases
  {:test {:extra-paths ["test"]

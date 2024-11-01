@@ -8,7 +8,8 @@
    [clojure.java.io :as java-io]
    [tech.v3.io :as io]
    [babashka.fs :refer [create-dirs]]
-   [ta.db.bars.protocol :refer [bardb barsource]]))
+   [ta.db.bars.protocol :refer [bardb barsource]])
+  (:import (java.io FileNotFoundException)))
 
 (defn save-ds [filename ds]
   (let [s (io/gzip-output-stream! filename)]
@@ -22,7 +23,10 @@
     ds))
 
 (defn append-ds [filename ds]
-  (let [existing-ds (load-ds filename)]
+  (let [existing-ds (try
+                      (load-ds filename)
+                      (catch FileNotFoundException ex
+                        (tc/dataset [])))]
     (debug "appending series " filename " count:" (tc/row-count ds) ", existing:" (tc/row-count existing-ds))
     (save-ds filename (tc/concat existing-ds ds))))
 

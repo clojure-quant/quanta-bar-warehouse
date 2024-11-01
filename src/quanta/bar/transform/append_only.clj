@@ -8,15 +8,8 @@
    [ta.calendar.validate :as cal]
    [ta.db.bars.protocol :refer [barsource] :as b]
    [quanta.calendar.core :refer [current-close next-close]]
-   [quanta.bar.transform.helper :refer [get-source-interval]]))
-
-(defn get-last-dt [ds]
-  (->> (tc/last ds) :date first))
-
-(defn load-stored-bars [opts window]
-  (let [engine (:engine opts)
-        opts-clean (select-keys opts [:asset :calendar :bardb])]
-    (b/get-bars engine opts-clean window)))
+   [quanta.bar.transform.helper :refer [get-last-dt get-source-interval load-stored-bars]])
+  (:import (java.io FileNotFoundException)))
 
 (defn load-and-compress-bars [opts window]
   (let [engine (:engine opts)
@@ -87,7 +80,10 @@
        (if interval-source
          (let [calendar-source [market interval-source]
                opts-source (assoc opts :calendar calendar-source)
-               ds-higher (m/? (load-stored-bars opts-source window))
+               ds-higher (try
+                           (m/? (load-stored-bars opts-source window))
+                           (catch FileNotFoundException ex
+                             (tc/dataset [])))
                _ (warn "append-only [" interval-source "=> " interval "] opts: " (select-keys opts-source [:task-id :asset :calendar :import]))]
            (cond
              (not ds-higher)
@@ -114,7 +110,10 @@
          (do
            (info "append-only for" interval "- forwarding request to bar-engine")
            (try
-             (let [stored-ds (m/? (load-stored-bars opts window))
+             (let [stored-ds (try
+                               (m/? (load-stored-bars opts window))
+                               (catch FileNotFoundException ex
+                                 (tc/dataset [])))
                    import-window (missing-bars-window stored-ds calendar window)]
                (when import-window
                  (let [imported-ds (m/? (import-bars opts import-window))]
