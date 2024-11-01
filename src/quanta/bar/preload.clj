@@ -28,7 +28,7 @@
   (m/sp
    (info  label " importing bars for: " asset)
    (try
-     (let [opts-import (dissoc opts :to :window :label :retries)
+     (let [opts-import (dissoc opts :window :label :retries)
            ds (m/? (b/get-bars bar-engine opts-import window))
              ;(with-retries retries b/get-bars bar-engine opts-import window)
            c (tc/row-count ds)]
