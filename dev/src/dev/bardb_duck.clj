@@ -1,4 +1,4 @@
-(ns quanta.notebook.docs.bardb-duck
+(ns dev.bardb-duck
   (:require
    [tick.core :as t]
    [tablecloth.api :as tc]

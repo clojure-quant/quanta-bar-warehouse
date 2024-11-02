@@ -1,4 +1,4 @@
-(ns quanta.algo.env.bars
+(ns quanta.bar.env
   (:require
    [taoensso.timbre :refer [trace debug info warn error]]
    [missionary.core :as m]
@@ -22,14 +22,15 @@
 
 (defn get-bars
   "returns bars for asset/calendar/window"
-  [spec window]
-  (let [calendar (get-calendar spec)
-        asset (get-asset spec)]
-    (assert *bar-db* "environment does not provide bar-db!")
+  [opts window]
+  (let [calendar (:calendar opts)
+        asset (:asset opts)]
+    (info "get-bars: " window)
     (assert asset "cannot get-bars for unknown asset!")
     (assert calendar "cannot get-bars for unknown calendar!")
     (assert window "cannot get-bars for unknown window!")
-    (b/get-bars *bar-db* spec window)))
+    (assert *bar-db* "environment does not provide bar-db!")
+    (b/get-bars *bar-db* opts window)))
 
 (defn get-bars-aligned-filled
   "returns bars for asset/calendar/window"
@@ -54,7 +55,7 @@
      :end dend-instant}))
 
 (defn get-trailing-bars [opts bar-close-date]
-  ;(info "get-trailing-bars " bar-close-date)
+  (info "get-trailing-bars " bar-close-date)
   (m/sp
    (let [trailing-n (get-trailing-n opts)
          calendar (get-calendar opts)

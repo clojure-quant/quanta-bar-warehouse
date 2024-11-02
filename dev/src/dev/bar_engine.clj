@@ -11,17 +11,20 @@ dt
 ;; BYBIT
 (m/? (b/get-bars
       bar-engine {:asset "ETHUSDT" ; crypto
-                  :calendar [:crypto :m]
+                  :calendar [:crypto :d]
                   :import :bybit-parallel}
+
       {:start  (t/instant "2024-05-01T00:00:00Z")
        :end (t/instant "2024-07-01T00:00:00Z")}))
 
 ;; ALPHAVANTAGE
-(b/get-bars im {:asset "FMCDX" ; mutual fund
-                :calendar [:us :d]
-                :import :alphavantage}
-            {:start dt
-             :mode :append})
+(m/? (b/get-bars
+      bar-engine
+      {:asset "FMCDX" ; mutual fund
+       :calendar [:us :d]
+       :import :alphavantage}
+      {:start dt
+       :mode :append}))
 
 (defn date-type [ds]
   (-> ds :date meta :datatype))
