@@ -71,15 +71,3 @@
         (count bardb) " dbs"
         (count transform) " transformers")
   (bar-engine. import (wrap-task bardb) transform))
-
-(defrecord bar-engine-sync [base]
-  barsource
-  (get-bars [_ opts window]
-    (m/?
-     (b/get-bars base opts window)))
-  bardb
-  (append-bars [_ opts bar-ds]
-    (b/append-bars base opts bar-ds)))
-
-(defn create-engine-sync [bar-engine]
-  (bar-engine-sync. bar-engine))

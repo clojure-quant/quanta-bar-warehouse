@@ -1,6 +1,7 @@
 (ns quanta.algo.env.bars
   (:require
    [taoensso.timbre :refer [trace debug info warn error]]
+   [missionary.core :as m]
    [de.otto.nom.core :as nom]
    [tick.core :as t]
    [tablecloth.api :as tc]
@@ -52,16 +53,17 @@
     {:start dstart-instant
      :end dend-instant}))
 
-(defn get-trailing-bars [spec bar-close-date]
+(defn get-trailing-bars [opts bar-close-date]
   ;(info "get-trailing-bars " bar-close-date)
-  (let [trailing-n (get-trailing-n spec)
-        calendar (get-calendar spec)
-        calendar-seq (trailing-window calendar trailing-n bar-close-date)
-        window (calendar-seq->window calendar-seq)
-        bar-ds (get-bars spec window)]
-    (if (= 0 (tc/row-count bar-ds))
-      (throw (ex-info "empty-bars" {:asset (get-asset spec) :n trailing-n :calendar calendar :dt bar-ds :window window}))
-      bar-ds)))
+  (m/sp
+   (let [trailing-n (get-trailing-n opts)
+         calendar (get-calendar opts)
+         calendar-seq (trailing-window calendar trailing-n bar-close-date)
+         window (calendar-seq->window calendar-seq)
+         bar-ds (m/? (get-bars opts window))]
+     (if (= 0 (tc/row-count bar-ds))
+       (throw (ex-info "empty-bars" {:asset (get-asset opts) :n trailing-n :calendar calendar :dt bar-ds :window window}))
+       bar-ds))))
 
 #_(defn get-bars-lower-timeframe [env spec lower-timeframe]
     (let [calendar (get-calendar spec)
