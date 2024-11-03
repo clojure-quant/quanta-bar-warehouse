@@ -9,7 +9,10 @@
    [ta.db.bars.protocol :as b]
    [ta.db.bars.aligned :as aligned]))
 
-(def ^:dynamic *bar-db* nil)
+(defn get-bar-db [env]
+  (let [bar-db (:bar-db env)]
+    (assert bar-db ":env does not provide :bar-db")
+    bar-db))
 
 (defn- get-asset [spec]
   (:asset spec))
@@ -22,24 +25,22 @@
 
 (defn get-bars
   "returns bars for asset/calendar/window"
-  [opts window]
+  [env opts window]
   (let [calendar (:calendar opts)
         asset (:asset opts)]
     (info "get-bars: " window)
     (assert asset "cannot get-bars for unknown asset!")
     (assert calendar "cannot get-bars for unknown calendar!")
     (assert window "cannot get-bars for unknown window!")
-    (assert *bar-db* "environment does not provide bar-db!")
-    (b/get-bars *bar-db* opts window)))
+    (b/get-bars (get-bar-db env) opts window)))
 
 (defn get-bars-aligned-filled
   "returns bars for asset/calendar/window"
-  [{:keys [asset calendar] :as opts} calendar-seq]
-  (assert *bar-db* "environment does not provide bar-db!")
+  [env {:keys [asset calendar] :as opts} calendar-seq]
   (assert asset "cannot get-bars for unknown asset!")
   (assert calendar "cannot get-bars for unknown calendar!")
   (assert calendar-seq "cannot get-bars-aligned for unknown window!")
-  (aligned/get-bars-aligned-filled *bar-db* opts calendar-seq))
+  (aligned/get-bars-aligned-filled (get-bar-db env) opts calendar-seq))
 
 #_(defn get-calendar-time [env calendar]
     (let [calendar-time (:calendar-time env)]
@@ -54,14 +55,14 @@
     {:start dstart-instant
      :end dend-instant}))
 
-(defn get-trailing-bars [opts bar-close-date]
+(defn get-trailing-bars [env opts bar-close-date]
   (info "get-trailing-bars " bar-close-date)
   (m/sp
    (let [trailing-n (get-trailing-n opts)
          calendar (get-calendar opts)
          calendar-seq (trailing-window calendar trailing-n bar-close-date)
          window (calendar-seq->window calendar-seq)
-         bar-ds (m/? (get-bars opts window))]
+         bar-ds (m/? (get-bars env opts window))]
      (if (= 0 (tc/row-count bar-ds))
        (throw (ex-info "empty-bars" {:asset (get-asset opts) :n trailing-n :calendar calendar :dt bar-ds :window window}))
        bar-ds))))
@@ -76,10 +77,10 @@
       (get-bars {:asset asset
                  :calendar calendar-lower} window)))
 
-(defn get-multiple-bars [{:keys [assets] :as opts} cal-seq]
+(defn get-multiple-bars [env {:keys [assets] :as opts} cal-seq]
   (let [get-bars (fn [asset]
                    (info "loading: " asset)
-                   (-> (get-bars-aligned-filled (assoc opts :asset asset) cal-seq)
+                   (-> (get-bars-aligned-filled env (assoc opts :asset asset) cal-seq)
                        (tc/add-column :asset asset)))
         asset-map-seq (map (fn [asset]
                              {:asset asset
@@ -94,7 +95,7 @@
      :good assets-good
      :bars bars-good}))
 
-(defn get-multiple-bars-trailing [{:keys [calendar assets trailing-n] :as opts} end-dt]
+(defn get-multiple-bars-trailing [env {:keys [calendar assets trailing-n] :as opts} end-dt]
   (let [cal-seq (trailing-window calendar trailing-n end-dt)]
-    (get-multiple-bars opts cal-seq)))
+    (get-multiple-bars env opts cal-seq)))
 
