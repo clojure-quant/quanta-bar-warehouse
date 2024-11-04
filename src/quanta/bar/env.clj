@@ -67,6 +67,16 @@
        (throw (ex-info "empty-bars" {:asset (get-asset opts) :n trailing-n :calendar calendar :dt bar-ds :window window}))
        bar-ds))))
 
+(defn get-trailing-bars-window [env opts dt]
+  (m/sp
+   (if-let [width (get-in opts [:window :width])]
+     (let [trailing-n (min 80 (int (/ width 10)))]
+       (info "trailing window!" (str "window width:" width " trailing# " trailing-n))
+       (m/? (get-trailing-bars env (assoc opts :trailing-n trailing-n) dt)))
+     (do
+       (info "trailing window-no-width" opts)
+       (m/? (get-trailing-bars env opts dt))))))
+
 #_(defn get-bars-lower-timeframe [env spec lower-timeframe]
     (let [calendar (get-calendar spec)
           market (first calendar)
