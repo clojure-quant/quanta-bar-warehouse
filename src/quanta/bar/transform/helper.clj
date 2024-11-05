@@ -16,3 +16,12 @@
   (let [engine (:engine opts)
         opts-clean (select-keys opts [:asset :calendar :bardb])]
     (b/get-bars engine opts-clean window)))
+
+(defn write-bars [opts bar-ds]
+  (assert (contains? opts :to) ":to not set. need target bardb for writing")
+  (let [{:keys [engine to asset calendar]} opts
+        opts-clean {:asset asset
+                    :calendar calendar
+                    :bardb to}]
+    (info "writing bars:" opts-clean)
+    (b/append-bars engine opts-clean bar-ds)))

@@ -6,7 +6,7 @@
    [tablecloth.api :as tc]
    [ta.db.bars.protocol :as b]
    [quanta.calendar.core :refer [fixed-window]]
-   [quanta.market.barimport.bybit.normalize-request :refer [window->open-time]]
+   [quanta.market.barimport.time-helper :refer [window->open-time]]
    [ta.db.bars.duckdb.delete :refer [delete-bars]]
    [ta.import.helper.retries :refer [with-retries]]))
 

@@ -1,24 +1,25 @@
 (ns dev.env
   (:require
-   [clojure.edn :as edn]
+    [clojure.edn :as edn]
    ;; asset db
-   [quanta.market.asset.db :as asset-db]
+    [quanta.market.asset.db :as asset-db]
    ; bardb
-   [ta.db.bars.nippy :refer [start-bardb-nippy]]
+    [ta.db.bars.nippy :refer [start-bardb-nippy]]
    ;; imports
-   [quanta.market.barimport.bybit.import :refer [create-import-bybit]]
-   [quanta.market.barimport.bybit.import-parallel :refer [create-import-bybit-parallel]]
-   [quanta.market.barimport.kibot.api :refer [create-import-kibot]]
-   [quanta.market.barimport.kibot.http :refer [create-import-kibot-http]]
-   [quanta.market.asset.load :refer [add-lists-to-db]]
+    [quanta.market.barimport.bybit.import :refer [create-import-bybit]]
+    [quanta.market.barimport.bybit.import-parallel :refer [create-import-bybit-parallel]]
+    [quanta.market.barimport.kibot.api :refer [create-import-kibot]]
+    [quanta.market.barimport.kibot.http :refer [create-import-kibot-http]]
+    [quanta.market.asset.load :refer [add-lists-to-db]]
    ;[ta.import.provider.eodhd.ds :refer [create-import-eodhd]]
    ;[ta.import.provider.alphavantage.ds :refer [create-import-alphavantage]]
    ;; bar-engine
-   [quanta.bar.engine :refer [start-bar-engine]]
+    [quanta.bar.engine :refer [start-bar-engine]]
    ; transform
-   [quanta.bar.transform.compress :refer [start-transform-compress]]
-   [quanta.bar.transform.shuffle :refer [start-transform-shuffle]]
-   [quanta.bar.transform.append-only :refer [start-transform-append-only]]))
+    [quanta.bar.transform.compress :refer [start-transform-compress]]
+    [quanta.bar.transform.shuffle :refer [start-transform-shuffle]]
+    [quanta.bar.transform.append-only :refer [start-transform-append-only]]
+    [quanta.bar.transform.forex-no-asia :refer [start-transform-forex-no-asia]]))
 
 (def bardb-nippy
   (start-bardb-nippy ".data/nippy/"))
@@ -52,7 +53,8 @@
              :bybit-parallel (create-import-bybit-parallel)}
     :transform {:compress (start-transform-compress interval-config)
                 :shuffle (start-transform-shuffle)
-                :append-only (start-transform-append-only interval-config)}}))
+                :append-only (start-transform-append-only interval-config)
+                :forex-no-asia (start-transform-forex-no-asia)}}))
 
 (def assets
   [; kibot

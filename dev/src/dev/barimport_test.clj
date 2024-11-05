@@ -3,7 +3,8 @@
    [tick.core :as t]
    [ta.calendar.core :refer [trailing-range]]
    [ta.db.bars.protocol :as b]
-   [dev.env :refer [bar-engine]]))
+   [dev.env :refer [bar-engine]]
+   [missionary.core :as m]))
 
 (def dt (-> (t/instant)
             (t/<< (t/new-duration 2 :days))))
@@ -51,12 +52,13 @@ dt
 ;;    | 2024-10-06T23:59:59Z | 62824.80 | 64470.19 | 62115.15 | 62218.75 | 19762.195435 |
 ;;    | 2024-10-07T23:59:59Z | 62218.75 | 63202.67 | 61857.13 | 62156.22 | 20361.789732 |
 
-(b/get-bars bar-engine
-            {:asset "EUR/USD" ; forex
-             :calendar [:forex :d]
-             :import :kibot}
-            {:start (t/instant "2023-01-01T00:00:00Z")
-             :end (t/instant "2024-05-01T00:00:00Z")})
+(m/? (b/get-bars bar-engine
+                 {:asset "EUR/USD" ; forex
+                  :calendar [:forex :d]
+                  :import :kibot-http
+                  :to :nippy}
+                 {:start (t/instant "2023-01-01T00:00:00Z")
+                  :end (t/instant "2024-05-01T00:00:00Z")}))
 ;; => kibot-bars [347 6]:
 ;;    
 ;;    |                                    :date |   :open |   :high |    :low |  :close | :volume |
