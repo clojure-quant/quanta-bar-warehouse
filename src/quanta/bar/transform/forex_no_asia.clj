@@ -1,13 +1,13 @@
 (ns quanta.bar.transform.forex-no-asia
   (:require
-    [taoensso.timbre :as timbre :refer [debug info warn error]]
-    [missionary.core :as m]
-    [tablecloth.api :as tc]
-    [tick.core :as t]
-    [ta.calendar.validate :as cal]
-    [ta.db.bars.protocol :refer [barsource] :as b]
-    [ta.calendar.calendars :refer [get-calendar] :as calendars]
-    [quanta.bar.transform.helper :refer [write-bars]])
+   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [missionary.core :as m]
+   [tablecloth.api :as tc]
+   [tick.core :as t]
+   [ta.calendar.validate :as cal]
+   [ta.db.bars.protocol :refer [barsource] :as b]
+   [ta.calendar.calendars :refer [get-calendar] :as calendars]
+   [quanta.bar.transform.helper :refer [write-bars]])
   (:import (java.io FileNotFoundException)))
 
 (defn parse-interval-kw [interval-kw]
@@ -29,7 +29,6 @@
                     :bardb to}]
     (info "filter calendar (forex-no-asia) - append-bars" opts-clean)
     (b/append-bars engine opts-clean bar-ds)))
-
 
 ;NOTE: expects :forex calendar because the day-open? check is left out for performance reasons
 (defrecord transform-forex-no-asia []
@@ -65,8 +64,7 @@
                                                   time (t/time zoned-dt)]
                                               (and (t/>= time first-close)
                                                    (t/<= time close)))
-                                           :date))
-             ]
+                                           :date))]
          (info "filter calendar (forex-no-asia) - result: " (tc/row-count filtered-ds) " of total bars:" (tc/row-count bar-ds))
          (write-bars (assoc opts :calendar [to-calendar-kw to-interval-kw])
                      filtered-ds))

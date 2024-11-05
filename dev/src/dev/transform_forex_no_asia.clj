@@ -45,11 +45,11 @@
 
 ; data available:
 (m/?
-  (b/get-bars bar-engine
-              {:asset "EUR/USD"
-               :calendar [:forex-no-asia :m5]
-               :bardb :nippy}
-              {}))
+ (b/get-bars bar-engine
+             {:asset "EUR/USD"
+              :calendar [:forex-no-asia :m5]
+              :bardb :nippy}
+             {}))
 
 ;;
 (parse-interval-kw :m4)

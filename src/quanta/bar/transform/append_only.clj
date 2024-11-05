@@ -1,14 +1,14 @@
 (ns quanta.bar.transform.append-only
   (:require
-    [taoensso.timbre :as timbre :refer [debug info warn error]]
-    [de.otto.nom.core :as nom]
-    [missionary.core :as m]
-    [tablecloth.api :as tc]
-    [tick.core :as t]
-    [ta.calendar.validate :as cal]
-    [ta.db.bars.protocol :refer [barsource] :as b]
-    [quanta.calendar.core :refer [current-close next-close prior-close]]
-    [quanta.bar.transform.helper :refer [get-last-dt get-source-interval load-stored-bars]])
+   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [de.otto.nom.core :as nom]
+   [missionary.core :as m]
+   [tablecloth.api :as tc]
+   [tick.core :as t]
+   [ta.calendar.validate :as cal]
+   [ta.db.bars.protocol :refer [barsource] :as b]
+   [quanta.calendar.core :refer [current-close next-close prior-close]]
+   [quanta.bar.transform.helper :refer [get-last-dt get-source-interval load-stored-bars]])
   (:import (java.io FileNotFoundException)))
 
 (defn missing-bars-window
@@ -50,7 +50,7 @@
         engine (:engine opts)
         opts-clean (select-keys (assoc opts :transform :compress)
                                 [:asset :calendar :bardb :to :transform])]
-    (info "append-only - compress-bars" opts-clean "compress window:" compress-window "full window:" window )
+    (info "append-only - compress-bars" opts-clean "compress window:" compress-window "full window:" window)
     (b/get-bars engine opts-clean compress-window)))
 
 (defn import-bars [opts window]

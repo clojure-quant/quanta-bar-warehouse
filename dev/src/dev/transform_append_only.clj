@@ -162,7 +162,6 @@
 ;| 2024-09-07T00:00:00Z | 56177.67 | 57018.51 | 52535.50 | 53961.62 | 33299.004330 | BTCUSDT |
 ;| 2024-09-08T00:00:00Z | 53961.62 | 54851.34 | 53750.02 | 54164.51 | 22779.134421 | BTCUSDT |
 
-
 (m/?
  (b/get-bars bar-engine
              {:asset "BTCUSDT"
@@ -196,7 +195,6 @@
 ;| 2024-09-07T23:58:00Z | 54146.80 | 54174.00 | 54146.79 | 54148.01 | 12.154609 | BTCUSDT |
 ;| 2024-09-07T23:59:00Z | 54148.01 | 54181.99 | 54145.14 | 54181.99 |  7.293840 | BTCUSDT |
 ;| 2024-09-08T00:00:00Z | 54181.99 | 54181.99 | 54148.01 | 54164.51 | 14.264258 | BTCUSDT |
-
 
 ; compress
 (m/?
@@ -235,7 +233,6 @@
 ;| 2024-09-07T22:00:00Z | 54160.06 | 54193.95 | 53862.84 | 53928.09 |  633.419891 |     60 |
 ;| 2024-09-07T23:00:00Z | 53928.09 | 54090.68 | 53864.49 | 53958.50 |  543.640332 |     60 |
 ;| 2024-09-08T00:00:00Z | 53958.50 | 54215.23 | 53809.51 | 54164.51 |  640.556576 |     60 |
-
 
 ;; append-only
 (m/?
@@ -278,11 +275,11 @@
 
 ; new data available:
 (m/?
-  (b/get-bars bar-engine
-              {:asset "BTCUSDT"
-               :calendar [:crypto :d]
-               :bardb :nippy}
-              {}))
+ (b/get-bars bar-engine
+             {:asset "BTCUSDT"
+              :calendar [:crypto :d]
+              :bardb :nippy}
+             {}))
 
 ;=> _unnamed [45 7]:
 ;
@@ -310,7 +307,6 @@
 ;| 2024-09-13T00:00:00Z | 57334.15 | 58582.80 | 57318.13 | 58134.02 | 24532.880423 | BTCUSDT |
 ;| 2024-09-14T00:00:00Z | 58134.02 | 60628.71 | 57627.44 | 60486.46 | 27348.341105 | BTCUSDT |
 ;| 2024-09-15T00:00:00Z | 60486.46 | 60605.59 | 59381.96 | 59993.99 | 10879.880909 | BTCUSDT |
-
 
 (m/?
  (b/get-bars bar-engine
@@ -352,22 +348,22 @@
 
 ; new data
 (m/?
-  (b/get-bars bar-engine
-              {:asset "BTCUSDT"
-               :calendar [:crypto :m]
-               :bardb :nippy}
-              {}))
+ (b/get-bars bar-engine
+             {:asset "BTCUSDT"
+              :calendar [:crypto :m]
+              :bardb :nippy}
+             {}))
 
 (m/?
-  (b/get-bars bar-engine
-              {:asset "BTCUSDT"
-               :calendar [:crypto :m5]
-               :bardb :nippy
-               :to :nippy
-               :import :bybit-parallel
-               :transform :append-only}
-              {:start (t/instant "2024-09-07T23:57:00Z")
-               :end (t/instant "2024-09-08T01:14:00Z")}))
+ (b/get-bars bar-engine
+             {:asset "BTCUSDT"
+              :calendar [:crypto :m5]
+              :bardb :nippy
+              :to :nippy
+              :import :bybit-parallel
+              :transform :append-only}
+             {:start (t/instant "2024-09-07T23:57:00Z")
+              :end (t/instant "2024-09-08T01:14:00Z")}))
 ;=> _unnamed [14 8]:
 ;
 ;|                :date |    :open |    :high |     :low |   :close |   :volume | :count |  :asset |
