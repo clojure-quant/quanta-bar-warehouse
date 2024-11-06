@@ -34,9 +34,10 @@
            c (tc/row-count ds)]
        (info "saving asset:" asset " count: " c " calendar: " calendar)
                   ;(delete-bars to [:forex :d] asset)
-       (b/append-bars bar-engine {:asset asset
-                                  :calendar calendar
-                                  :bardb to} ds)
+       (when (not (some #(= (:transform opts) %) [:append-only :forex-no-asia]))
+         (b/append-bars bar-engine {:asset asset
+                                    :calendar calendar
+                                    :bardb to} ds))
        {:asset asset
         :start (-> ds tc/first :date first)
         :end (-> ds tc/last :date first)

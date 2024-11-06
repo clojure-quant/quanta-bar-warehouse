@@ -42,12 +42,8 @@
                  (next-close calendar-source))
      :end (current-close calendar end)}))
 
-(defn compress-bars [stored-ds opts window]
-  (let [uncompressed-window (missing-bars-window stored-ds (:calendar opts) window)
-        compress-window (if uncompressed-window
-                          uncompressed-window
-                          window)
-        engine (:engine opts)
+(defn compress-bars [opts window compress-window]
+  (let [engine (:engine opts)
         opts-clean (select-keys (assoc opts :transform :compress)
                                 [:asset :calendar :bardb :to :transform])]
     (info "append-only - compress-bars" opts-clean "compress window:" compress-window "full window:" window)
@@ -104,15 +100,17 @@
                ;; import
                (let [import-window (missing-bars-window ds-higher calendar-source aligned-source-window)]
                  (when import-window
-                   (let [imported-source-ds (m/? (import-bars opts-source import-window))
-                         _ (append-bars opts-source imported-source-ds)])))
+                   (let [imported-source-ds (m/? (import-bars opts-source import-window))]
+                     (append-bars opts-source imported-source-ds))))
                ;; compress
                (let [ds (try
                           (m/? (load-stored-bars opts aligned-source-window))
                           (catch FileNotFoundException ex
                             (tc/dataset [])))
-                     compressed-ds (m/? (compress-bars ds opts aligned-source-window))
-                     _ (append-bars opts compressed-ds)])
+                     compress-window (missing-bars-window ds (:calendar opts-source) aligned-source-window)]
+                 (when (and compress-window (t/<= (:start compress-window) (:end compress-window)))
+                   (let [compressed-ds (m/? (compress-bars opts window compress-window))]
+                     (append-bars opts compressed-ds))))
                ;; load
                (try
                  (m/? (load-stored-bars opts window))

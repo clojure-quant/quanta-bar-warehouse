@@ -7,7 +7,7 @@
    [ta.calendar.validate :as cal]
    [ta.db.bars.protocol :refer [barsource] :as b]
    [ta.calendar.calendars :refer [get-calendar] :as calendars]
-   [quanta.bar.transform.helper :refer [write-bars]])
+   [quanta.bar.transform.helper :refer [load-stored-bars write-bars]])
   (:import (java.io FileNotFoundException)))
 
 (defn parse-interval-kw [interval-kw]
@@ -20,15 +20,14 @@
        :n (if (nth match 2)
             (Integer/parseInt (nth match 2))
             1)})))
-
-(defn append-bars [opts bar-ds]
-  (assert (contains? opts :to) ":to not set. need target bardb for appending")
-  (let [{:keys [engine to asset calendar]} opts
-        opts-clean {:asset asset
-                    :calendar calendar
-                    :bardb to}]
-    (info "filter calendar (forex-no-asia) - append-bars" opts-clean)
-    (b/append-bars engine opts-clean bar-ds)))
+(defn init-bars [{:keys [engine] :as opts} window]
+  (try
+    (debug "filter calendar (forex-no-asia) - forwarding to append-only transform")
+    (b/get-bars engine
+                (assoc opts :transform :append-only)
+                window)
+    (catch FileNotFoundException ex
+      (tc/dataset []))))
 
 ;NOTE: expects :forex calendar because the day-open? check is left out for performance reasons
 (defrecord transform-forex-no-asia []
@@ -47,27 +46,26 @@
              {:keys [open close timezone] :as to-calendar-spec} (get-calendar to-calendar-kw)
              {:keys [n unit] :as interval-map} (parse-interval-kw to-interval-kw)
              _ (assert interval-map (str "interval-kw could not be parsed or to big: " interval-map))
-             first-close (t/>> open (t/new-duration n unit))
              ; source calendar
-             bar-ds (try
-                      (debug "filter calendar (forex-no-asia) - forwarding to append-only transform")
-                      (m/? (b/get-bars engine
-                                       (assoc opts :transform :append-only)
-                                       window))
-                      (catch FileNotFoundException ex
-                        (tc/dataset [])))
+             bar-ds (m/? (init-bars opts window))
              ; target calendar
              filtered-ds (if (tc/empty-ds? bar-ds)
                            bar-ds
                            (tc/select-rows bar-ds
                                            #(let [zoned-dt (t/in (:date %) timezone)
-                                                  time (t/time zoned-dt)]
+                                                  time (t/time zoned-dt)
+                                                  first-close (t/>> open (t/new-duration n unit))]
                                               (and (t/>= time first-close)
                                                    (t/<= time close)))
-                                           :date))]
+                                           :date))
+             target-opt (assoc opts :calendar [to-calendar-kw to-interval-kw])]
          (info "filter calendar (forex-no-asia) - result: " (tc/row-count filtered-ds) " of total bars:" (tc/row-count bar-ds))
-         (write-bars (assoc opts :calendar [to-calendar-kw to-interval-kw])
-                     filtered-ds))
+         (write-bars target-opt filtered-ds)
+         ;filtered-ds
+         (try
+           (m/? (load-stored-bars target-opt window))
+           (catch FileNotFoundException ex
+             (tc/dataset []))))
        (catch AssertionError ex
          (error "filter calendar (forex-no-asia) - assertion:" window opts " exception: " ex))
        (catch Exception ex
