@@ -54,7 +54,10 @@
 ;;
 (parse-interval-kw :m4)
 
-;; transform with importer
+;;
+(def window {:start (t/instant "2024-08-01T00:01:00Z")
+             :end (t/instant "2024-09-10T00:00:00Z")})
+
 (m/?
  (import-bars
   bar-engine
@@ -63,9 +66,19 @@
    :import :kibot-http
    :bardb :nippy
    :to :nippy
-   :transform :forex-no-asia
-   :window {:start (t/instant "2024-08-01T00:01:00Z")
-            :end (t/instant "2024-09-10T00:00:00Z")}
+   :window window
+   :label "import kibot :m"}))
+
+(m/?
+ (import-bars
+  bar-engine
+  {:asset "EUR/USD"
+   :calendar [:forex :m5]
+   :import :kibot-http
+   :bardb :nippy
+   :to :nippy
+   :transform :compress
+   :window window
    :label "import kibot :m"}))
 
 (m/?
@@ -77,6 +90,5 @@
    :bardb :nippy
    :to :nippy
    :transform :forex-no-asia
-   :window {:start (t/instant "2024-08-01T00:01:00Z")
-            :end (t/instant "2024-09-10T00:00:00Z")}
+   :window window
    :label "import kibot :m5"}))

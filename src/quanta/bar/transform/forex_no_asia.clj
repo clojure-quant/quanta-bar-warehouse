@@ -20,14 +20,6 @@
        :n (if (nth match 2)
             (Integer/parseInt (nth match 2))
             1)})))
-(defn init-bars [{:keys [engine] :as opts} window]
-  (try
-    (debug "filter calendar (forex-no-asia) - forwarding to append-only transform")
-    (b/get-bars engine
-                (assoc opts :transform :append-only)
-                window)
-    (catch FileNotFoundException ex
-      (tc/dataset []))))
 
 ;NOTE: expects :forex calendar because the day-open? check is left out for performance reasons
 (defrecord transform-forex-no-asia []
@@ -47,7 +39,7 @@
              {:keys [n unit] :as interval-map} (parse-interval-kw to-interval-kw)
              _ (assert interval-map (str "interval-kw could not be parsed or to big: " interval-map))
              ; source calendar
-             bar-ds (m/? (init-bars opts window))
+             bar-ds (m/? (load-stored-bars opts window))
              ; target calendar
              filtered-ds (if (tc/empty-ds? bar-ds)
                            bar-ds
