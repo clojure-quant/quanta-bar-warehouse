@@ -48,7 +48,7 @@
                            count)})
      (catch Exception ex
        (error "could not get bars for asset: " asset " error: " (ex-message ex)
-               "ex-info: " ex)
+              "ex-info: " ex)
        {:asset asset
         :count 0
         :error (ex-message ex)}))))
