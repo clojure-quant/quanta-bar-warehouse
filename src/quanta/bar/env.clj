@@ -70,12 +70,23 @@
 (defn get-trailing-bars-window [env opts dt]
   (m/sp
    (if-let [width (get-in opts [:window :width])]
-     (let [trailing-n (min 80 (int (/ width 10)))]
+     (let [bar-px (or (get opts :bar-px) 10)
+           preload-n (or (get opts :preload-n) 0)
+           trailing-n (-> (int (/ width bar-px))
+                          (+ preload-n))]
        (info "trailing window!" (str "window width:" width " trailing# " trailing-n))
        (m/? (get-trailing-bars env (assoc opts :trailing-n trailing-n) dt)))
      (do
        (info "trailing window-no-width" opts)
        (m/? (get-trailing-bars env opts dt))))))
+
+(defn remove-preload [opts ds]
+  (if (get-in opts [:window :width])
+    (let [preload-n (or (get opts :preload-n) 0)]
+      (if (> preload-n 0)
+        (tc/select-rows ds (range preload-n (tc/row-count ds)))
+        ds))
+    ds))
 
 #_(defn get-bars-lower-timeframe [env spec lower-timeframe]
     (let [calendar (get-calendar spec)
