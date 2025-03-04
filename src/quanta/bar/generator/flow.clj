@@ -2,7 +2,7 @@
   (:require
    [missionary.core :as m]
    [tick.core :as t]
-   [quanta.bar.generator.bar :refer [create-bars]]))
+   [quanta.bar.generator.bar :refer [create-bars-ds]]))
 
 (defn take-until
   "like take-while, but includes the first element that 
@@ -43,12 +43,10 @@
 (defn trade-time-vec->bar [trade-time-vec]
   (let [trades (butlast trade-time-vec)
         dt  (last trade-time-vec)]
-    (create-bars dt trades)))
+    (create-bars-ds dt trades)))
 
 (defn bar-f [clock-t trade-flow]
   (let [vec-flow (time-buffered clock-t trade-flow)]
-    (m/eduction (map trade-time-vec->bar) vec-flow)
-    ;vec-flow
-    ))
+    (m/eduction (map trade-time-vec->bar) vec-flow)))
 
 

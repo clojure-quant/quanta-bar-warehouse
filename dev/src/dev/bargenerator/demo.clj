@@ -4,32 +4,7 @@
    [tick.core :as t]
    [quanta.bar.generator.flow :refer [time-buffered bar-f]]
    [quanta.bar.generator :refer [start-generating-clock start-generating stop-generating]]
-   [dev.bargenerator.randomfeed :refer [trade-producer]]))
-
-(defn mix
-  "Return a flow which is mixed by flows"
-  ; will generate (count flows) processes, 
-  ; so each mixed flow has its own process
-  [& flows]
-  (m/ap (m/?> (m/?> (count flows) (m/seed flows)))))
-
-(def trade-feed
-  (mix (trade-producer "A" 1.0 3000)
-       (trade-producer "B" 10.0 3000)
-       (trade-producer "C" 100.0 3000)))
-
-(comment
-  (m/?
-   (m/reduce conj []
-             (m/eduction (take 5) trade-feed)))
-
-  ;[{:volume 34, :asset "B", :price 9.98609337717243}
-  ; {:volume 4, :asset "B", :price 9.943237802872938}
-  ; {:volume 97, :asset "A", :price 1.0038424574580802}
-  ; {:volume 31, :asset "C", :price 100.41281594563398}
-  ; {:volume 45, :asset "B", :price 9.928846880638302}]
-  ;
-  )
+   [dev.bargenerator.randomfeed :refer [trade-feed]]))
 
 ; 
 ((->>
@@ -75,9 +50,5 @@
 
 (stop-generating :bongo)
 
-(start-generating
- trade-feed
- [:crypto :m])
 
-(stop-generating [:crypto :m])
 

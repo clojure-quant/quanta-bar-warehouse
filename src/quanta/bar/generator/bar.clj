@@ -1,4 +1,6 @@
-(ns quanta.bar.generator.bar)
+(ns quanta.bar.generator.bar
+  (:require
+   [tablecloth.api :as tc]))
 
 (defn add-trade [{:keys [_open high low volume ticks] :as bar} {:keys [price] :as trade}]
   (assoc bar
@@ -37,6 +39,10 @@
        vals
        (map (partial create-bar dt))))
 
+(defn create-bars-ds [dt trades]
+  (-> (create-bars dt trades)
+      (tc/dataset)))
+
 (comment
   (def trades [{:volume 3, :asset "B", :price 9.999495246345742}
                {:volume 34, :asset "B", :price 9.982399541778701}
@@ -47,6 +53,7 @@
                {:volume 21, :asset "B", :price 9.912512426148753}])
   (require '[tick.core :as t])
   (create-bars (t/instant) trades)
+  (create-bars-ds (t/instant) trades)
  ;  
   )
 
