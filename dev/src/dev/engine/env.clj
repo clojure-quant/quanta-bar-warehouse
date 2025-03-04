@@ -4,7 +4,7 @@
    ;; asset db
    [quanta.market.asset.db :as asset-db]
    ; bardb
-   [ta.db.bars.nippy :refer [start-bardb-nippy]]
+   [quanta.bar.db.nippy :refer [start-bardb-nippy]]
    ;; imports
    [quanta.market.barimport.bybit.import :refer [create-import-bybit]]
    [quanta.market.barimport.bybit.import-parallel :refer [create-import-bybit-parallel]]

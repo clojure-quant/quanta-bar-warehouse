@@ -1,11 +1,11 @@
-(ns ta.db.bars.duckdb.get-bars
+(ns quanta.bar.db.duck.get-bars
   (:require
-   [de.otto.nom.core :as nom]
    [taoensso.timbre :as timbre :refer [debug info warn error]]
    [tick.core :as t]
    [tablecloth.api :as tc]
    [tmducken.duckdb :as duckdb]
-   [ta.db.bars.duckdb.calendar :refer [bar-category->table-name]]))
+   [quanta.bar.db.duck.calendar :refer [bar-category->table-name]]
+   [quanta.bar.db.duck.ds :refer [empty-ds]]))
 
 (defn keywordize-columns [ds]
   (tc/rename-columns
@@ -17,7 +17,6 @@
     "close" :close
     "volume" :volume
     "asset" :asset
-    "epoch" :epoch
     "ticks" :ticks}))
 
 (defn sql-query-bars-for-asset [calendar asset]
@@ -83,9 +82,8 @@
                    :else
                    (get-bars-full session calendar asset))]
       (cond
-        (or (nil? bar-ds)
-            (= 0 (tc/row-count bar-ds)))
-        (nom/fail ::get-bars-duckdb {:message (str "asset " asset " has no bars in duckdb!")})
+        (nil? bar-ds)
+        empty-ds
 
         :else
         bar-ds))
@@ -93,40 +91,5 @@
       (error "get-bars " (select-keys opts [:task-id :asset :calendar :import])
              " window: " (select-keys window [:start :end])
              "exception: " ex)
-      (nom/fail ::get-bars-duckdb {:message (str "get-bars asset: " asset
-                                                 " calendar: " calendar
-                                                 "exception! ")}))))
-
-(comment
-
-  (get-bars db [:us :m] "EUR/USD")
-  (get-bars db [:us :m] "ETHUSDT")
-
-  (sql-query-bars-for-asset-since
-   [:us :m] "EUR/USD" "2024-01-26T19:35:00Z")
-
-  (require '[tick.core :as t])
-  (def dt (t/instant "2024-01-26T19:35:00Z"))
-  dt
-
-  (get-bars-since db [:us :m] "EUR/USD" "2024-01-26T19:35:00Z")
-  (get-bars-since db [:us :m] "EUR/USD" "2024-01-26 19:35:00")
-  (get-bars-since db [:us :m] "EUR/USD" dt)
-
-  (def dt2 (t/instant "2024-01-26T16:35:00Z"))
-  (get-bars-since db [:us :m] "EUR/USD" dt2)
-
-  (get-bars-window db [:us :m] "EUR/USD"
-                   "2024-01-26T19:35:00Z"
-                   "2024-01-26T19:45:00Z")
-
-  (get-bars-window db [:us :m] "ETHUSDT"
-                   "2024-01-29T18:56:00Z"
-                   "2024-01-29T19:00:00Z")
-
-  (get-bars-window db [:us :m] "ETHUSDT"
-                   (t/instant "2024-01-29T18:56:00Z")
-                   (t/instant "2024-01-29T19:00:00Z"))
-
-  (get-bars-since db [:us :m] "EUR/USD" time)
-  (get-bars-since db [:us :m] "EUR/USD" (str time)))
+      (throw (ex-info "get-bars duckdb" {:window (select-keys window [:start :end])
+                                         :opts (select-keys opts [:asset :calendar])})))))

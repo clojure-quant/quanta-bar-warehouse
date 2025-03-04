@@ -1,4 +1,4 @@
-(ns quanta.dev.bardb.bardb-compress
+(ns dev.bardb.bardb-compress
   (:require
    [tick.core :as t]
    [tablecloth.api :as tc]

@@ -3,7 +3,7 @@
    [tick.core :as t]
    [tablecloth.api :as tc]
    [ta.db.bars.protocol :as b]
-   [ta.db.bars.duckdb :as duck]
+   [quanta.bar.db.duckdb :as duck]
    [modular.system]))
 
 (def db (modular.system/system :duckdb))

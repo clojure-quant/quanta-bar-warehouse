@@ -1,9 +1,9 @@
-(ns quanta.dev.bardb.bardb-duck-delete
+(ns dev.bardb.bardb-duck-delete
   (:require
    [tick.core :as t]
    [tablecloth.api :as tc]
    [ta.db.bars.protocol :as b]
-   [ta.db.bars.duckdb :as duck]
+   [quanta.bar.db.duckdb :as duck]
    [ta.db.bars.dynamic.overview-db :refer [remove-asset]]
    [modular.system]))
 

@@ -1,9 +1,9 @@
-(ns quanta.dev.bardb.bardb-load
+(ns dev.bardb.bardb-load
   (:require
    [tick.core :as t]
    [tablecloth.api :as tc]
    [ta.db.bars.protocol :as b]
-   [ta.db.bars.nippy :as nippy]
+   [quanta.bar.db.nippy :as nippy]
    [modular.system]))
 
 (def db (modular.system/system :duckdb))

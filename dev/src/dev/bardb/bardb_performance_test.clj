@@ -1,4 +1,4 @@
-(ns quanta.dev.bardb.bardb-performance-test
+(ns dev.bardb.bardb-performance-test
   (:require
    [taoensso.timbre :refer [trace debug info warn error]]
    [clojure.string :as str]
@@ -8,7 +8,7 @@
    [clojure.java.io :as java-io]
    [ta.db.bars.protocol :refer [bardb barsource]]
    [ta.db.bars.protocol :as b]
-   [ta.db.bars.duckdb :refer [start-bardb-duck stop-bardb-duck]]
+   [quanta.bar.db.duckkdb :refer [start-bardb-duck stop-bardb-duck]]
    [ta.calendar.calendars :refer [calendars]]
    [ta.calendar.core :as cal]
    [ta.algo.env :as algo-env-impl]
@@ -250,7 +250,7 @@
   ;(def db (modular.system/system :duckdb))
 
   ; init db
-  (require '[ta.db.bars.duckdb :refer [start-bardb-duck]])
+  (require '[quanta.bar.db.duckkdb :refer [start-bardb-duck]])
   (def db-name "duckdb-partitioning_crypto_m_1a_100y.db")
   (def db-path "~/Desktop/tmp")
   (def hive-path "~/Desktop/tmp/hive")

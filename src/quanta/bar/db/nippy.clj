@@ -1,7 +1,7 @@
-(ns ta.db.bars.nippy
+(ns quanta.bar.db.nippy
   (:require
    [clojure.string :as str]
-   [de.otto.nom.core :as nom]
+   [missionary.core :as m]
    [taoensso.timbre :as timbre :refer [debug info warn error]]
    [tablecloth.api :as tc]
    [tick.core :as t]
@@ -50,18 +50,20 @@
       (tc/add-column :asset (:asset opts))
       (filter-range window)))
 
+(defn append-bars-nippy [this opts ds-bars]
+  (case (:write-mode opts)
+    :append
+    (append-ds (filename-asset this opts) ds-bars)
+
+    (save-ds (filename-asset this opts) ds-bars)))
+
 (defrecord bardb-nippy [base-path]
   barsource
   (get-bars [this opts window]
-    (get-bars-nippy this opts window))
+    (m/via m/blk (get-bars-nippy this opts window)))
   bardb
-  (append-bars [this opts ds-bars]
-    ;(info "this: " this)
-    (case (:write-mode opts)
-      :append
-      (append-ds (filename-asset this opts) ds-bars)
-
-      (save-ds (filename-asset this opts) ds-bars))))
+  (append-bars [this opts bar-ds]
+    (m/via m/blk (append-bars-nippy this opts bar-ds))))
 
 (defn start-bardb-nippy [base-path]
   (debug "creating dir: " base-path)

@@ -6,3 +6,7 @@
 .data
 dev/bars.log
 dev/quotes.log
+dev/classes
+*.ddb
+*.wal
+dev/binaries

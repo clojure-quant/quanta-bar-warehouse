@@ -1,4 +1,4 @@
-(ns quanta.dev.bardb.bardb-dynamic
+(ns dev.bardb.bardb-dynamic
   (:require
    [tick.core :as t]
    [modular.system]

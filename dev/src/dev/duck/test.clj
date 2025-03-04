@@ -5,7 +5,7 @@
    [modular.system]
    [ta.calendar.core :as cal]
    [ta.db.bars.protocol :as b]
-   [ta.db.bars.duckdb :as duck]
+   [quanta.bar.db.duckkdb :as duck]
    [quanta.studio.bars.transform.dynamic :as dynamic]))
 
 ;; Test if duckdb get/append works
