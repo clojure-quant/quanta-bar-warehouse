@@ -4,3 +4,5 @@
 .nrepl-port
 .calva
 .data
+dev/bars.log
+dev/quotes.log

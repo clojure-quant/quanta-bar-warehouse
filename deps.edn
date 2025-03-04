@@ -2,11 +2,11 @@
  :deps
  {org.clojure/clojure    {:mvn/version "1.11.3"}
   ; deps for tml-ds storage to nippy and duckdb
-  com.taoensso/nippy {:mvn/version "3.3.0"}
+  com.taoensso/nippy {:mvn/version "3.4.2"}
   techascent/tech.io {:mvn/version "4.31"}
-  com.techascent/tmducken {:mvn/version "0.10.0-2"}
+  com.techascent/tmducken {:mvn/version "0.10.1-01"}
   ; quanta
-  io.github.clojure-quant/quanta {:mvn/version "0.4.899"}
+  io.github.clojure-quant/quanta {:mvn/version "0.4.901"}
   io.github.clojure-quant/quanta-market {:mvn/version "0.1.156"}}
  :aliases
  {:test {:extra-paths ["test"]
