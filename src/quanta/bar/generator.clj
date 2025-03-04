@@ -50,8 +50,3 @@
     (swap! state dissoc market-kw)
     (bar-writer)
     (quote-writer)))
-
-@state
-
-(def x (m/rdv))
-(m/? (x 3))
