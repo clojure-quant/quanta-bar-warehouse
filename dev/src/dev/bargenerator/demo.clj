@@ -1,27 +1,27 @@
 (ns dev.bargenerator.demo
-    (:require
-     [missionary.core :as m]
-     [tick.core :as t]
-     [quanta.bar.generator.flow :refer [time-buffered bar-f]]
-     [quanta.bar.generator :refer [start-generating-clock start-generating stop-generating]]
-     [dev.bargenerator.randomfeed :refer [trade-producer]]))
-  
-  (defn mix
-    "Return a flow which is mixed by flows"
+  (:require
+   [missionary.core :as m]
+   [tick.core :as t]
+   [quanta.bar.generator.flow :refer [time-buffered bar-f]]
+   [quanta.bar.generator :refer [start-generating-clock start-generating stop-generating]]
+   [dev.bargenerator.randomfeed :refer [trade-producer]]))
+
+(defn mix
+  "Return a flow which is mixed by flows"
   ; will generate (count flows) processes, 
   ; so each mixed flow has its own process
-    [& flows]
-    (m/ap (m/?> (m/?> (count flows) (m/seed flows)))))
+  [& flows]
+  (m/ap (m/?> (m/?> (count flows) (m/seed flows)))))
 
-  (def trade-feed
-    (mix (trade-producer "A" 1.0 3000)
-         (trade-producer "B" 10.0 3000)
-         (trade-producer "C" 100.0 3000)))
+(def trade-feed
+  (mix (trade-producer "A" 1.0 3000)
+       (trade-producer "B" 10.0 3000)
+       (trade-producer "C" 100.0 3000)))
 
-  (comment
-    (m/?
-     (m/reduce conj []
-               (m/eduction (take 5) trade-feed)))
+(comment
+  (m/?
+   (m/reduce conj []
+             (m/eduction (take 5) trade-feed)))
 
   ;[{:volume 34, :asset "B", :price 9.98609337717243}
   ; {:volume 4, :asset "B", :price 9.943237802872938}
@@ -29,16 +29,16 @@
   ; {:volume 31, :asset "C", :price 100.41281594563398}
   ; {:volume 45, :asset "B", :price 9.928846880638302}]
   ;
-    )
+  )
 
 ; 
-  ((->>
-    (time-buffered (m/sleep 500 (t/instant)) trade-feed)
-    (m/eduction (take 2))
+((->>
+  (time-buffered (m/sleep 500 (t/instant)) trade-feed)
+  (m/eduction (take 2))
   ;(m/eduction (map count))
   ;(m/eduction (map create-bars))
-    (m/reduce conj))
-   prn prn)
+  (m/reduce conj))
+ prn prn)
 
 ;[[{:price 0.997403395039221, :asset "A", :volume 51}
 ;  {:price 10.006800707984176, :asset "B", :volume 35}
@@ -48,11 +48,11 @@
 ;  {:price 0.995669860312596, :asset "A", :volume 87}
 ;  #time/instant "2025-03-03T14:50:29.494585260Z"]]
 
-  ((->>
-    (bar-f (m/sleep 500 (t/instant)) trade-feed)
-    (m/eduction (take 2))
-    (m/reduce conj))
-   prn prn)
+((->>
+  (bar-f (m/sleep 500 (t/instant)) trade-feed)
+  (m/eduction (take 2))
+  (m/reduce conj))
+ prn prn)
 
 ;[({:date #time/instant "2025-03-03T15:04:43.244003164Z", :asset "A", :open 1.0016767928925834, :high 1.0026038401386101,
 ;   :low 1.0002319391938983, :close 1.0023027142089445, :volume 169, :ticks 4} 
@@ -68,18 +68,16 @@
 ;   :low 100.14107405468624, :close 100.14107405468624, :volume 76, :ticks 1})]
 ;  {:asset "B", :open 9.97283954627333, :high 10.012884979302775, :low 9.887987949353631, :close 10.007831185340638, :volume 608, :ticks 12})]
 
-(start-generating-clock 
- trade-feed 
+(start-generating-clock
+ trade-feed
  (m/sleep 5000 (t/instant))
  :bongo)
 
 (stop-generating :bongo)
 
-
 (start-generating
  trade-feed
  [:crypto :m])
-
 
 (stop-generating [:crypto :m])
 

@@ -4,8 +4,7 @@
    [missionary.core :as m]
    [quanta.calendar.scheduler :refer [get-calendar-flow]]
    [quanta.bar.generator.flow :refer [bar-f]]
-   [quanta.bar.generator.util :refer [log-flow-to]]
-   ))
+   [quanta.bar.generator.util :refer [log-flow-to]]))
 
 (defn extended-quote-f [market-kw quote-f]
   (m/eduction
@@ -22,8 +21,7 @@
         generated-bar-f (bar-f clock-t trade-f)]
     (swap! state assoc market-kw
            {:bar-writer (log-flow-to "quotes.log" quote-block-f)
-            :quote-writer (log-flow-to "bars.log" generated-bar-f)}
-           )))
+            :quote-writer (log-flow-to "bars.log" generated-bar-f)})))
 
 (defn start-generating [trade-f calendar]
   (let [[market-kw interval-kw] calendar
@@ -43,12 +41,9 @@
            {:bar-writer (log-flow-to "quotes.log" quote-block-f)
             :quote-writer (log-flow-to "bars.log" generated-bar-f)
             :runner (runner-t
-                     (fn [_] (println"\nbar-generator-task completed\n"))
+                     (fn [_] (println "\nbar-generator-task completed\n"))
                      (fn [ex] (println "\nbar-generator-task crash\n " ex)))
-            :calendar-f calendar-done-f
-            })))
-
-
+            :calendar-f calendar-done-f})))
 
 (defn stop-generating [market-kw]
   (when-let [{:keys [bar-writer quote-writer]} (market-kw @state)]

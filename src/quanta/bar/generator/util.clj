@@ -2,8 +2,7 @@
   (:require
    [tick.core :as t]
    [missionary.core :as m])
-   (:import [java.io StringWriter])
-  )
+  (:import [java.io StringWriter]))
 
 (defn log-text [filename s]
   (spit filename s :append true))
