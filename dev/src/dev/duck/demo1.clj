@@ -4,11 +4,26 @@
    [missionary.core :as m]
    [tablecloth.api :as tc]
    [ta.db.bars.protocol :as b]
-   [quanta.bar.db.duck :as duck]))
+   [quanta.bar.db.duck :as duck]
+   [quanta.bar.db.duck.warehouse :as wh]
+   [quanta.bar.compressor :refer [compress]]))
 
 (def db (duck/start-bardb-duck "duck11.ddb"))
 
+(def db (duck/start-bardb-duck "random-quotes.ddb"))
+
 db
+
+(duck/stop-bardb-duck db)
+
+(wh/get-data-range db [:us :d] "XXX")
+
+(wh/warehouse-summary db [:crypto :m])
+(wh/warehouse-summary db [:crypto :h])
+
+(m/?
+ (compress db {:calendar-from [:crypto :m]
+               :calendar-to [:crypto :h]}))
 
 (def bar-ds
   (-> {:date [(t/instant "2022-03-05T00:00:00Z")
