@@ -1,5 +1,6 @@
 (ns quanta.bar.compressor
   (:require
+   [taoensso.timbre :as timbre :refer [debug info warn error]]
    [missionary.core :as m]
    [tick.core :as t]
    [tablecloth.api :as tc]
@@ -29,6 +30,7 @@
 (defn compress-tasks [bar-db {:keys [calendar-from
                                      calendar-to]}]
   (m/sp
+   (info "compressing from: " calendar-from " to: " calendar-to)
    (let [summary-from (m/? (summary bar-db {:calendar calendar-from}))
          summary-to (m/? (summary bar-db {:calendar calendar-to}))
          dict-from (table-dict summary-from)
@@ -44,18 +46,23 @@
   (m/sp
    (let [tasks (m/? (compress-tasks bar-db convert))
          load-compress-append-t (fn [{:keys [asset start end]}]
-                                  (m/sp (let [bar-ds (m/? (b/get-bars bar-db
-                                                                      {:asset asset
-                                                                       :calendar calendar-from}
-                                                                      {:start start
-                                                                       :end end}))
-                                              bars2 (compress-to-calendar bar-ds calendar-to)
+                                  (m/sp
+                                   (try
+                                     (let [bar-ds (m/? (b/get-bars bar-db
+                                                                   {:asset asset
+                                                                    :calendar calendar-from}
+                                                                   {:start start
+                                                                    :end end}))
+                                           bars2 (compress-to-calendar bar-ds calendar-to)
                                            ; bars2 have :count column. If this is not 60 (for min->hour), 
                                            ; we could filter them, or write a warning.
-                                              ]
-                                          (m/? (b/append-bars bar-db {:asset asset
-                                                                      :calendar calendar-to} bars2))
-                                          bars2)))]
+                                           ]
+                                       (m/? (b/append-bars bar-db {:asset asset
+                                                                   :calendar calendar-to} bars2))
+                                       bars2)
+                                     (catch Exception ex
+                                       (error "compress-bars " asset start end " failed: " (ex-message ex))
+                                       nil))))]
      (if (seq tasks)
        (m/? (apply m/join vector (map load-compress-append-t tasks)))
        nil))))
