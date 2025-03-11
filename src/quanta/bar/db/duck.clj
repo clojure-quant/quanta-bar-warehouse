@@ -27,9 +27,9 @@
      :new? new?}))
 
 (defn- duckdb-stop-impl [{:keys [conn] :as session}]
-  (try 
+  (try
     (info "duck-db stop. session: " (keys session))
-    (duckdb/disconnect conn)  
+    (duckdb/disconnect conn)
     (catch Exception ex
       (error "duck-db stop exception: " (ex-message ex)))))
 
