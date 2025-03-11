@@ -36,5 +36,6 @@
     (when ds
       (-> ds
           (tc/set-dataset-name (str "warehouse " calendar))
-          convert-columns-to-keywords))))
+          convert-columns-to-keywords
+          (tc/order-by :asset)))))
 

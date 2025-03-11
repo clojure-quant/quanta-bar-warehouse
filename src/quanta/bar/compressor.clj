@@ -53,6 +53,7 @@
                                                                     :calendar calendar-from}
                                                                    {:start start
                                                                     :end end}))
+                                           bar-ds  (tc/select-rows bar-ds #(t/> (:date %) start))
                                            bars2 (compress-to-calendar bar-ds calendar-to)
                                            ; bars2 have :count column. If this is not 60 (for min->hour), 
                                            ; we could filter them, or write a warning.

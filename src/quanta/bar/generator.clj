@@ -31,9 +31,9 @@
         calendar-f (get-calendar-flow calendar)
         calendar-done-f  (m/ap (let [dt (m/?> calendar-f)
                                      dt-inst (t/instant dt)]
-                                 (info "generating bars for dt: " dt-inst)
+                                 (info "generate-bars " calendar dt-inst " start..")
                                  (m/? (clock-t dt-inst)) ; trigger generation and wait until finished
-                                 (info "bar-generator has written bars for " dt calendar)
+                                 (info "generate-bars " calendar dt-inst " success!")
                                  dt-inst))
         generated-bar-f (bar-f clock-t trade-f)
         written-bar-f (m/ap (let [bar-ds (m/?> generated-bar-f)]
