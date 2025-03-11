@@ -26,8 +26,12 @@
      :conn conn
      :new? new?}))
 
-(defn- duckdb-stop-impl [{:keys [db conn] :as session}]
-  (duckdb/disconnect conn))
+(defn- duckdb-stop-impl [{:keys [conn] :as session}]
+  (try 
+    (info "duck-db stop. session: " (keys session))
+    (duckdb/disconnect conn)  
+    (catch Exception ex
+      (error "duck-db stop exception: " (ex-message ex)))))
 
 ;; CREATE INDEX s_idx ON films (revenue);
 

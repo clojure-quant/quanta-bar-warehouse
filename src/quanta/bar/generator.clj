@@ -2,10 +2,12 @@
   (:require
    [tick.core :as t]
    [missionary.core :as m]
+   [taoensso.timbre :as timbre :refer [debug info warn error]]
    [quanta.calendar.scheduler :refer [get-calendar-flow]]
    [ta.db.bars.protocol :refer [append-bars]]
    [quanta.bar.generator.flow :refer [bar-f]]
-   [quanta.bar.generator.util :refer [log-flow-to]]))
+   [quanta.bar.generator.util :refer [log-flow-to]]
+   [tablecloth.api :as tc]))
 
 #_(defn extended-quote-f [market-kw quote-f]
     (m/eduction
@@ -29,21 +31,22 @@
         calendar-f (get-calendar-flow calendar)
         calendar-done-f  (m/ap (let [dt (m/?> calendar-f)
                                      dt-inst (t/instant dt)]
-                                 (println "generating bars for dt: " dt-inst)
+                                 (info "generating bars for dt: " dt-inst)
                                  (m/? (clock-t dt-inst)) ; trigger generation and wait until finished
-                                 (println "bar-generator has written bars for " dt calendar)
+                                 (info "bar-generator has written bars for " dt calendar)
                                  dt-inst))
         generated-bar-f (bar-f clock-t trade-f)
         written-bar-f (m/ap (let [bar-ds (m/?> generated-bar-f)]
-                              (println "generated bar-ds: " bar-ds)
+                              ;(println "generated bar-ds: " bar-ds)
+                              (info "bar-generator has written bars #: " (tc/row-count bar-ds))
                               (m/? (append-bars db {:calendar calendar} bar-ds))))
         bar-writer-t (m/reduce (fn [_s _v] nil) nil written-bar-f)
         calendar-consumer-t (m/reduce (fn [s v] nil) nil calendar-done-f)
         runner-t (m/join vector bar-writer-t calendar-consumer-t)]
     (swap! state assoc market-kw
            {:runner (runner-t
-                     (fn [_] (println "\nbar-generator-task completed\n"))
-                     (fn [ex] (println "\nbar-generator-task crash\n " ex)))
+                     (fn [_] (info "bar-generator-task completed\n"))
+                     (fn [ex] (error "bar-generator-task crash\n " ex)))
             :calendar-f calendar-done-f})))
 
 (defn stop-generating [market-kw]
