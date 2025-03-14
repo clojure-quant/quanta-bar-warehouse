@@ -3,7 +3,7 @@
    [clojure.set :refer [subset?]]
    [tick.core :as t]
    [tablecloth.api :as tc]
-   [tech.v3.dataset :as ds]
+   [tech.v3.dataset :as tds]
    [quanta.bar.db.duck.calendar :refer [bar-category->table-name]]))
 
 (defn empty-ds [calendar]
@@ -18,7 +18,7 @@
 (defn order-columns [ds]
   ; see: https://github.com/techascent/tmducken/issues/18
   ; column order needs to be identical as in empty-ds
-  (ds/select-columns ds [:asset :date :open :high :low :close :volume :ticks]))
+  (tds/select-columns ds [:asset :date :open :high :low :close :volume :ticks]))
 
 (defn order-columns-old [ds]
   ; see: https://github.com/techascent/tmducken/issues/18

@@ -79,7 +79,7 @@
        (m/? (get-trailing-bars env (assoc opts :trailing-n trailing-n) last-interval)))
      (do
        (info "trailing window-no-width" opts)
-       (m/? (get-trailing-bars env opts dt))))))
+       (m/? (get-trailing-bars env opts last-interval))))))
 
 (defn remove-preload [opts ds]
   (if (get-in opts [:window :width])
