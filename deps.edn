@@ -6,7 +6,7 @@
   techascent/tech.io {:mvn/version "4.31"}
   com.techascent/tmducken {:mvn/version "0.10.1-01"}
   ; quanta
-  io.github.clojure-quant/quanta-calendar {:mvn/version "0.5.5"} ; to create duckdb schema
+  io.github.clojure-quant/quanta-calendar {:mvn/version "0.6.19"} ; to create duckdb schema, scheduler
   io.github.clojure-quant/quanta-market {:mvn/version "0.5.157"} ; protocols and barsource feeds
   }
  :aliases

@@ -3,8 +3,8 @@
    [tick.core :as t]
    [missionary.core :as m]
    [taoensso.timbre :as timbre :refer [debug info warn error]]
-   [quanta.calendar.scheduler :refer [get-calendar-flow]]
    [ta.db.bars.protocol :refer [append-bars]]
+   [quanta.calendar.env.scheduler :refer [get-calendar-flow-close-date]]
    [quanta.bar.generator.flow :refer [bar-f]]
    [quanta.bar.generator.util :refer [log-flow-to]]
    [tablecloth.api :as tc]))
@@ -28,7 +28,7 @@
 (defn start-generating [{:keys [db]} trade-f calendar]
   (let [[market-kw interval-kw] calendar
         clock-t (m/rdv)
-        calendar-f (get-calendar-flow calendar)
+        calendar-f (get-calendar-flow-close-date calendar)
         calendar-done-f  (m/ap (let [dt (m/?> calendar-f)
                                      dt-inst (t/instant dt)]
                                  (info "generate-bars " calendar dt-inst " start..")

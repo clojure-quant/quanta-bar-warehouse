@@ -5,7 +5,8 @@
    [de.otto.nom.core :as nom]
    [tick.core :as t]
    [tablecloth.api :as tc]
-   [ta.calendar.core :refer [trailing-window #_get-bar-window]]
+   [quanta.calendar.window :refer [trailing-window window-summary]]
+   [quanta.calendar.interval :as i]
    [ta.db.bars.protocol :as b]
    [ta.db.bars.aligned :as aligned]))
 
@@ -55,19 +56,19 @@
     {:start dstart-instant
      :end dend-instant}))
 
-(defn get-trailing-bars [env opts bar-close-date]
-  (info "get-trailing-bars " bar-close-date)
+(defn get-trailing-bars [env opts last-interval]
+  (info "get-trailing-bars " (i/current last-interval))
   (m/sp
    (let [trailing-n (get-trailing-n opts)
          calendar (get-calendar opts)
-         calendar-seq (trailing-window calendar trailing-n bar-close-date)
-         window (calendar-seq->window calendar-seq)
+         calendar-seq (trailing-window calendar trailing-n last-interval)
+         window (window-summary calendar-seq)
          bar-ds (m/? (get-bars env opts window))]
      (if (= 0 (tc/row-count bar-ds))
        (throw (ex-info "empty-bars" {:asset (get-asset opts) :n trailing-n :calendar calendar :dt bar-ds :window window}))
        bar-ds))))
 
-(defn get-trailing-bars-window [env opts dt]
+(defn get-trailing-bars-window [env opts last-interval]
   (m/sp
    (if-let [width (get-in opts [:window :width])]
      (let [bar-px (or (get opts :bar-px) 10)
@@ -75,7 +76,7 @@
            trailing-n (-> (int (/ width bar-px))
                           (+ preload-n))]
        (info "trailing window!" (str "window width:" width " trailing# " trailing-n))
-       (m/? (get-trailing-bars env (assoc opts :trailing-n trailing-n) dt)))
+       (m/? (get-trailing-bars env (assoc opts :trailing-n trailing-n) last-interval)))
      (do
        (info "trailing window-no-width" opts)
        (m/? (get-trailing-bars env opts dt))))))

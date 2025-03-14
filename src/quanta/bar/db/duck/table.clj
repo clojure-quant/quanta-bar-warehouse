@@ -2,8 +2,8 @@
   (:require
    [taoensso.timbre :as timbre :refer [debug info warn error]]
    [tmducken.duckdb :as duckdb]
-   [ta.calendar.calendars :refer [get-calendar-list]]
-   [ta.calendar.interval :refer [intervals]]
+   [quanta.calendar.db.calendars :refer [get-calendar-list]]
+   [quanta.calendar.db.interval :refer [all-intervals]]
    [quanta.bar.db.duck.calendar :refer [bar-category->table-name]]
    [quanta.bar.db.duck.ds :refer [empty-ds]]))
 
@@ -17,7 +17,9 @@
      (into []))))
 
 (defn- get-intervals []
-  (-> intervals keys))
+  all-intervals
+  ;(-> intervals keys)
+  )
 
 (defn all-table-defs []
   (let [cals (get-calendar-list)

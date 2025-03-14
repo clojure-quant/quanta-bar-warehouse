@@ -4,8 +4,8 @@
    [missionary.core :as m]
    [tick.core :as t]
    [tablecloth.api :as tc]
-   [quanta.calendar.compress :refer [compress-to-calendar]]
    [ta.db.bars.protocol  :as b]
+   [quanta.calendar.ds.compress :refer [compress-to-calendar]]
    [quanta.bar.db :refer [summary]]))
 
 (defn table-dict [ds]

@@ -4,9 +4,9 @@
    [de.otto.nom.core :as nom]
    [missionary.core :as m]
    [tablecloth.api :as tc]
-   [ta.calendar.validate :as cal]
-   [quanta.calendar.compress :refer [compress-to-calendar]]
    [ta.db.bars.protocol :refer [barsource] :as b]
+   [ta.calendar.validate :as cal]
+   [quanta.calendar.ds.compress :refer [compress-to-calendar]]
    [quanta.bar.transform.helper :refer [get-source-interval]]))
 
 (defn run-compress-safe [ds-higher calendar opts window]
