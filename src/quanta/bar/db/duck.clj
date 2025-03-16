@@ -4,6 +4,7 @@
    [clojure.java.io :as java-io]
    [missionary.core :as m]
    [tmducken.duckdb :as duckdb]
+   [quanta.calendar.window :refer [window-summary]]
    [ta.db.bars.protocol :refer [bardb barsource]]
    [quanta.bar.db :refer [bar-db]]
    [quanta.bar.db.duck.get-bars :refer [get-bars]]
@@ -41,8 +42,9 @@
     (m/sp
      (m/holding
       lock
-      (info "get-bars " (select-keys opts [:task-id :asset :calendar :import]) window)
-      (m/? (m/via m/blk (get-bars this opts window))))))
+      (let [w (window-summary window)]
+        (info "get-bars " (select-keys opts [:asset :calendar]) w)
+        (m/? (m/via m/blk (get-bars this opts w)))))))
   bardb
   (append-bars [this opts ds-bars]
     (m/via m/blk (m/holding lock (append-bars  this opts ds-bars))))

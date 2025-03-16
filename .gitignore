@@ -10,3 +10,4 @@ dev/classes
 *.ddb
 *.wal
 dev/binaries
+.eastwood
