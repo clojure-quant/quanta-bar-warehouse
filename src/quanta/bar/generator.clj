@@ -3,11 +3,12 @@
    [tick.core :as t]
    [missionary.core :as m]
    [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [tablecloth.api :as tc]
+   [quanta.calendar.interval :as i]
+   [quanta.calendar.env.scheduler :refer [get-calendar-flow]]
    [ta.db.bars.protocol :refer [append-bars]]
-   [quanta.calendar.env.scheduler :refer [get-calendar-flow-close-date]]
    [quanta.bar.generator.flow :refer [bar-f]]
-   [quanta.bar.generator.util :refer [log-flow-to]]
-   [tablecloth.api :as tc]))
+   [quanta.bar.generator.util :refer [log-flow-to]]))
 
 #_(defn extended-quote-f [market-kw quote-f]
     (m/eduction
@@ -28,8 +29,11 @@
 (defn start-generating [{:keys [db]} trade-f calendar]
   (let [[market-kw interval-kw] calendar
         clock-t (m/rdv)
-        calendar-f (get-calendar-flow-close-date calendar)
-        calendar-done-f  (m/ap (let [dt (m/?> calendar-f)
+        calendar-f (get-calendar-flow calendar)
+        dt-f (m/eduction (map i/current)
+                         (map :close)
+                         calendar-f)
+        calendar-done-f  (m/ap (let [dt (m/?> dt-f)
                                      dt-inst (t/instant dt)]
                                  (info "generate-bars " calendar dt-inst " start..")
                                  (m/? (clock-t dt-inst)) ; trigger generation and wait until finished
