@@ -7,7 +7,8 @@
    [quanta.calendar.window :refer [trailing-window fixed-window]]
    [quanta.bar.db.duck :as duck]
    [quanta.bar.db.duck.warehouse :as wh]
-   [quanta.bar.compressor :refer [compress]]))
+   [quanta.bar.compressor :refer [compress]]
+   [quanta.bar.db.duck.delete :as d]))
 
 (def db (duck/start-bardb-duck "duck11.ddb"))
 
@@ -21,6 +22,10 @@ db
 
 (wh/warehouse-summary db [:crypto :m])
 (wh/warehouse-summary db [:crypto :h])
+
+(d/delete-bars-asset-dt db [:us :d] "XXX" (t/instant "2022-03-05T00:00:00.000Z"))
+(d/delete-bars-asset-dt db [:us :d] "XXX" (t/instant "2022-03-06T20:00:00Z"))
+(t/instant)
 
 (m/?
  (compress db {:calendar-from [:crypto :m]
