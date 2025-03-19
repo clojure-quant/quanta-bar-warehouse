@@ -53,7 +53,7 @@
 (defn get-bars-window [session calendar asset dstart dend]
   (debug "get-bars-window " asset dstart dend)
   (let [query (sql-query-bars-for-asset-window calendar asset dstart dend)]
-    (debug "sql-query: " query)
+    (info "sql-query: " query)
     (-> (duckdb/sql->dataset (:conn session) query)
         (keywordize-columns))))
 
@@ -66,7 +66,7 @@
 (defn get-bars
   "returns bar-ds for asset/calendar + window
    returns nom anomaly if there are no bars in the dataset."
-  [session {:keys [asset calendar] :as opts} {:keys [start end] :as window}]
+  [session {:keys [asset] :as opts} {:keys [calendar start end] :as window}]
   (try
     (let [; v0.10 of tmlducken cannot do queries with date
           ; being zoned-datetime

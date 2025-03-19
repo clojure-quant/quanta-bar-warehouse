@@ -5,7 +5,7 @@
    [de.otto.nom.core :as nom]
    [tick.core :as t]
    [tablecloth.api :as tc]
-   [quanta.calendar.window :refer [trailing-window]]
+   [quanta.calendar.window :as w]
    [quanta.calendar.interval :as i]
    [ta.db.bars.protocol :as b]
    [ta.db.bars.aligned :as aligned]))
@@ -24,11 +24,9 @@
 (defn get-bars
   "returns bars for asset/calendar/window"
   [env opts window]
-  (let [calendar (:calendar opts)
-        asset (:asset opts)]
+  (let [asset (:asset opts)]
     (info "get-bars: " window)
     (assert asset "cannot get-bars for unknown asset!")
-    (assert calendar "cannot get-bars for unknown calendar!")
     (assert window "cannot get-bars for unknown window!")
     (b/get-bars (get-bar-db env) opts window)))
 
@@ -44,7 +42,7 @@
   (info "get-trailing" trailing-n " bars ending: " (-> last-interval i/current :close))
   (m/sp
    (let [calendar (get-calendar opts)
-         window (trailing-window trailing-n last-interval)
+         window (w/window-extend-left last-interval trailing-n)
          bar-ds (m/? (get-bars env opts window))]
      (if (= 0 (tc/row-count bar-ds))
        (throw (ex-info "empty-bars" {:asset (get-asset opts) :n trailing-n :calendar calendar :dt bar-ds :window window}))
@@ -99,7 +97,7 @@
      :good assets-good
      :bars bars-good}))
 
-(defn get-multiple-bars-trailing [env {:keys [calendar assets trailing-n] :as opts} end-dt]
-  (let [cal-seq (trailing-window calendar trailing-n end-dt)]
-    (get-multiple-bars env opts cal-seq)))
+(defn get-multiple-bars-trailing [env {:keys [calendar assets trailing-n] :as opts} last-interval]
+  (let [window (w/window-extend-left last-interval trailing-n)]
+    (get-multiple-bars env opts window)))
 

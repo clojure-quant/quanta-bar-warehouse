@@ -4,7 +4,7 @@
    [clojure.java.io :as java-io]
    [missionary.core :as m]
    [tmducken.duckdb :as duckdb]
-   [quanta.calendar.window :refer [window-summary]]
+   [quanta.calendar.window :refer [window->close-range]]
    [ta.db.bars.protocol :refer [bardb barsource]]
    [quanta.bar.db :refer [bar-db]]
    [quanta.bar.db.duck.get-bars :refer [get-bars]]
@@ -42,7 +42,7 @@
     (m/sp
      (m/holding
       lock
-      (let [w (window-summary window)]
+      (let [w (window->close-range window)]
         (info "get-bars " (select-keys opts [:asset :calendar]) w)
         (m/? (m/via m/blk (get-bars this opts w)))))))
   bardb
