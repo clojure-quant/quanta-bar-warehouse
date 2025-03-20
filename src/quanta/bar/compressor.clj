@@ -5,6 +5,7 @@
    [tick.core :as t]
    [tablecloth.api :as tc]
    [ta.db.bars.protocol  :as b]
+   [quanta.calendar.window :as w]
    [quanta.calendar.ds.compress :refer [compress-to-calendar]]
    [quanta.bar.db :refer [summary]]))
 
@@ -48,11 +49,11 @@
          load-compress-append-t (fn [{:keys [asset start end]}]
                                   (m/sp
                                    (try
-                                     (let [bar-ds (m/? (b/get-bars bar-db
-                                                                   {:asset asset
-                                                                    :calendar calendar-from}
-                                                                   {:start start
-                                                                    :end end}))
+                                     (let [date-range {:start start :end end}
+                                           w (w/date-range->window calendar-from date-range)
+                                           _ (info "date-range: " date-range
+                                                   "window: " (w/window->close-range w))
+                                           bar-ds (m/? (b/get-bars bar-db {:asset asset} w))
                                            bar-ds  (tc/select-rows bar-ds #(t/> (:date %) start))
                                            bars2 (compress-to-calendar bar-ds calendar-to)
                                            ; bars2 have :count column. If this is not 60 (for min->hour), 

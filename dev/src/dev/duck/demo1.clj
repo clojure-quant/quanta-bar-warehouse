@@ -27,9 +27,21 @@ db
 (d/delete-bars-asset-dt db [:us :d] "XXX" (t/instant "2022-03-06T20:00:00Z"))
 (t/instant)
 
+(d/delete-calendar db [:crypto :h])
+
 (m/?
  (compress db {:calendar-from [:crypto :m]
                :calendar-to [:crypto :h]}))
+
+(m/? (b/get-bars db {:asset "A"}
+                 (w/date-range->window [:crypto :m]
+                                       {:start (t/instant "2025-03-04T00:00:00Z")
+                                        :end (t/instant "2025-03-06T20:00:00Z")})))
+
+(m/? (b/get-bars db {:asset "A"}
+                 (w/date-range->window [:crypto :h]
+                                       {:start (t/instant "2025-03-04T00:00:00Z")
+                                        :end (t/instant "2025-03-06T20:00:00Z")})))
 
 (def bar-ds
   (-> {:date [(t/instant "2022-03-05T00:00:00Z")
