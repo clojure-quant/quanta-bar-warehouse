@@ -8,7 +8,8 @@
    [quanta.bar.db.duck :as duck]
    [quanta.bar.db.duck.warehouse :as wh]
    [quanta.bar.compressor :refer [compress]]
-   [quanta.bar.db.duck.delete :as d]))
+   [quanta.bar.db.duck.delete :as d]
+   [quanta.bar.db.duck.admin :as admin]))
 
 (def db (duck/start-bardb-duck "duck11.ddb"))
 
@@ -19,6 +20,9 @@ db
 (duck/stop-bardb-duck db)
 
 (wh/get-data-range db [:us :d] "XXX")
+
+(admin/checkpoint db)
+(admin/db-size db)
 
 (wh/warehouse-summary db [:crypto :m])
 (wh/warehouse-summary db [:crypto :h])
