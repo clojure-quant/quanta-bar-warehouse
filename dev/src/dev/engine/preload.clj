@@ -2,7 +2,7 @@
   (:require
    [missionary.core :as m]
    [tick.core :as t]
-   [ta.db.bars.protocol :as b :refer [barsource bardb]]
+   [quanta.bar.protocol :as b :refer [barsource bardb]]
    [quanta.bar.preload :refer [import-bars import-bars-one]]
    [dev.env :refer [bar-engine]]))
 

@@ -1,6 +1,7 @@
 .lsp
 .cpcache
 .clj-kondo
+!.clj-kondo/config.edn # explicitly re-includes that file
 .nrepl-port
 .calva
 .data
@@ -11,3 +12,5 @@ dev/classes
 *.wal
 dev/binaries
 .eastwood
+binaries
+classes

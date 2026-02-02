@@ -2,7 +2,7 @@
   (:require
    [tick.core :as t]
    [missionary.core :as m]
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :as b]
    [dev.env :refer [bar-engine]]))
 
 (def dt (t/instant "2024-05-01T00:00:00Z"))

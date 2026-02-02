@@ -6,8 +6,8 @@
    [tmducken.duckdb :as duckdb]
    [tech.v3.dataset :as ds]
    [clojure.java.io :as java-io]
-   [ta.db.bars.protocol :refer [bardb barsource]]
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :refer [bardb barsource]]
+   [quanta.bar.protocol :as b]
    [quanta.bar.db.duckkdb :refer [start-bardb-duck stop-bardb-duck]]
    [ta.calendar.calendars :refer [calendars]]
    [ta.calendar.core :as cal]
@@ -261,7 +261,7 @@
   ;(create-hive-partition-by-year (:conn db) "crypto_m" (str hive-path"/"db-name))
 
   ; get window
-  ;(require '[ta.db.bars.protocol :as b])
+  ;(require '[quanta.bar.protocol :as b])
   ;(b/get-bars db {:asset "ASSET_1" :calendar [:crypto :m]} {:start (t/instant "2023-01-01T00:00:00Z") :end (t/instant "2023-01-01T00:10:00Z")})
 
   ;; Backtest

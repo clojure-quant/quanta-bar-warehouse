@@ -4,10 +4,12 @@
   ; deps for tml-ds storage to nippy and duckdb
   com.taoensso/nippy {:mvn/version "3.4.2"}
   techascent/tech.io {:mvn/version "4.31"}
+  babashka/fs {:mvn/version "0.5.22"}
   com.techascent/tmducken {:mvn/version "0.10.1-01"}
+  org.pinkgorilla/timbre {:mvn/version "0.0.7"}
   ; quanta
   io.github.clojure-quant/quanta-calendar {:mvn/version "0.6.27"} ; to create duckdb schema, scheduler
-  io.github.clojure-quant/quanta-market {:mvn/version "0.6.162"} ; protocols and barsource feeds
+
   }
  :aliases
  {:test {:extra-paths ["test"]
@@ -18,10 +20,10 @@
   :lint
   {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2024.03.13"}}
    :main-opts ["-m" "clj-kondo.main"
-               "--config" "cljkondo.edn"
+               "--config" ".cljkondo/config.edn"
                "--fail-level" "error"
                "--lint"
-               "./src"]}
+               "./src/quanta"]}
 
    :eastwood
   {:main-opts ["-m"

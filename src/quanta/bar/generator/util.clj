@@ -1,6 +1,5 @@
 (ns quanta.bar.generator.util
   (:require
-   [tick.core :as t]
    [missionary.core :as m])
   (:import [java.io StringWriter]))
 

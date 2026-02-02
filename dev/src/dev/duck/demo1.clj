@@ -3,7 +3,7 @@
    [tick.core :as t]
    [missionary.core :as m]
    [tablecloth.api :as tc]
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :as b]
    [quanta.calendar.window :as w]
    [quanta.bar.db.duck :as duck]
    [quanta.bar.db.duck.warehouse :as wh]

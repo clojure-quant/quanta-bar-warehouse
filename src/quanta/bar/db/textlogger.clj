@@ -1,7 +1,7 @@
 (ns quanta.bar.db.textlogger
   (:require
    [missionary.core :as m]
-   [ta.db.bars.protocol :refer [bardb]]))
+   [quanta.bar.protocol :refer [bardb]]))
 
 (defn log-text [filename s]
   (spit filename s :append true))

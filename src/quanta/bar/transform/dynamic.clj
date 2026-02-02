@@ -1,7 +1,7 @@
 (ns quanta.bar.transform.dynamic
   (:require
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
-   [ta.db.bars.protocol :refer [bardb barsource] :as b]
+   [taoensso.timbre :as timbre :refer [debug info error]]
+   [quanta.bar.protocol :refer [bardb barsource] :as b]
    [quanta.bar.transform.dynamic.overview-db :as overview]
    [quanta.bar.transform.dynamic.import :refer [import-on-demand]]))
 

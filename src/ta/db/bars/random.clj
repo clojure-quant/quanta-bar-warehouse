@@ -4,7 +4,7 @@
    [ta.helper.random :refer [random-series]]
    [ta.helper.date-ds :refer [days-ago]]
    [quanta.bar.transform.shuffle :refer [shuffle-bar-series]]
-   [ta.db.bars.protocol :as b]))
+   [quanta.bar.protocol :as b]))
 
 (defn add-open-high-low-volume [ds]
   (let [c (:close ds)]

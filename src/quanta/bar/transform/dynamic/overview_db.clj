@@ -1,6 +1,6 @@
 (ns quanta.bar.transform.dynamic.overview-db
   (:require
-   [taoensso.timbre :as timbre :refer [info warn error]]
+   [taoensso.timbre :as timbre :refer [info warn]]
    [tick.core :as t]
    [clojure.java.io :as io]
    [datahike.api :as d]))
@@ -95,7 +95,7 @@
     (d/transact conn [tx])))
 
 (defn remove-asset [conn {:keys [asset calendar] :as opts}]
-  (let [[market interval] calendar
+  (let [[_market _interval] calendar
         id (find-id conn opts)]
     (info "removing overview-db asset: " asset " " calendar " db-id: " id)
     (d/transact

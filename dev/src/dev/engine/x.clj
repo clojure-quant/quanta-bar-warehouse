@@ -1,7 +1,7 @@
 (ns quanta.notebook.docs.import-manager
   (:require
    [tick.core :as t]
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :as b]
    [modular.system]))
 
 (def im (modular.system/system :import-manager))

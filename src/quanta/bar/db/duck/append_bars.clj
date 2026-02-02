@@ -1,6 +1,6 @@
 (ns quanta.bar.db.duck.append-bars
   (:require
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [info warn error]]
    [tablecloth.api :as tc]
    [tmducken.duckdb :as duckdb]
    [quanta.bar.db.duck.calendar :refer [bar-category->table-name]]

@@ -3,7 +3,7 @@
    [taoensso.timbre :as timbre :refer [debug info warn error]]
    [tick.core :as t]
    [de.otto.nom.core :as nom]
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :as b]
    [quanta.bar.transform.dynamic.overview-db :as overview]
    [quanta.bar.transform.logger :as logger]))
 
@@ -31,7 +31,7 @@
        (remove nil?)))
 
 (defn import-needed? [tasks]
-  (not (empty? tasks)))
+  (seq tasks))
 
 (defn get-bars-safe [state opts task]
   (try
@@ -41,7 +41,7 @@
         (nom/fail ::get-bars-safe {:message "import-provider has returned nil."
                                    :opts opts
                                    :task task})))
-    (catch AssertionError ex
+    (catch AssertionError _ex
       (nom/fail ::get-bars-safe {:message "import-provider get-bars has thrown an assertion error"
                                  :opts opts
                                  :task task}))
@@ -89,7 +89,7 @@
     (do (warn "no import defined for asset: " asset " calendar: " calendar)
         '())))
 
-(defn import-on-demand [state {:keys [asset calendar] :as opts} req-window]
+(defn import-on-demand [state {:keys [_asset _calendar] :as opts} req-window]
   (info "import-on-demand " (select-keys opts [:task-id :asset :calendar :import]) req-window)
   (let [tasks (tasks-for-request state opts req-window)]
     (when (import-needed? tasks)

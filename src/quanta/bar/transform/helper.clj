@@ -1,8 +1,8 @@
 (ns quanta.bar.transform.helper
   (:require
    [tablecloth.api :as tc]
-   [ta.db.bars.protocol :refer [barsource] :as b]
-   [taoensso.timbre :as timbre :refer [debug info warn error]]))
+   [quanta.bar.protocol :as b]
+   [taoensso.timbre :as timbre :refer [info warn error]]))
 
 (defn get-source-interval [interval-config interval]
   (let [source-interval (get interval-config interval)]

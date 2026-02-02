@@ -4,10 +4,11 @@
    [taoensso.timbre :refer [info warn error]]
    [missionary.core :as m]
    [tablecloth.api :as tc]
-   [ta.db.bars.protocol :as b]
-   [quanta.calendar.window :refer [date-range->window]]
-   [ta.db.bars.duckdb.delete :refer [delete-bars]]
-   [ta.import.helper.retries :refer [with-retries]]))
+   [quanta.bar.protocol :as b]
+   ;[quanta.calendar.window :refer [date-range->window]]
+   ;[quanta.bar.db.duck.delete :refer [delete-bars]]
+   ;[ta.import.helper.retries :refer [with-retries]]
+   ))
 
 ;; TODO: make delete a interface, so it works for nippy and duckdb.
 
@@ -20,9 +21,10 @@
    :labelS    optional label for logging
    :retries   optional, number of retries to import bars."
   [bar-engine
-   {:keys [asset calendar to window retries label]
+   {:keys [asset calendar to window _retries label]
     :or {label ""
-         retries 5}
+         ;retries 5
+         }
     :as opts}]
   (m/sp
    (info  label " importing bars for: " asset)

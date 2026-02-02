@@ -1,12 +1,12 @@
 (ns quanta.bar.transform.append-only
   (:require
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [info warn error]]
    [de.otto.nom.core :as nom]
    [missionary.core :as m]
    [tablecloth.api :as tc]
    [tick.core :as t]
    [ta.calendar.validate :as cal]
-   [ta.db.bars.protocol :refer [barsource] :as b]
+   [quanta.bar.protocol :refer [barsource] :as b]
    [quanta.calendar.core :refer [current-close next-close prior-close]]
    [quanta.bar.transform.helper :refer [get-last-dt get-source-interval load-stored-bars]])
   (:import (java.io FileNotFoundException)))
@@ -82,7 +82,7 @@
                aligned-source-window (aligned-window calendar calendar-source window)
                ds-higher (try
                            (m/? (load-stored-bars opts-source aligned-source-window))
-                           (catch FileNotFoundException ex
+                           (catch FileNotFoundException _ex
                              (tc/dataset [])))
                _ (warn "append-only [" interval-source "=> " interval "] opts: " (select-keys opts-source [:task-id :asset :calendar :import]))]
            (cond
@@ -105,7 +105,7 @@
                ;; compress
                (let [ds (try
                           (m/? (load-stored-bars opts aligned-source-window))
-                          (catch FileNotFoundException ex
+                          (catch FileNotFoundException _ex
                             (tc/dataset [])))
                      compress-window (missing-bars-window ds (:calendar opts-source) aligned-source-window)]
                  (when (and compress-window (t/<= (:start compress-window) (:end compress-window)))
@@ -114,7 +114,7 @@
                ;; load
                (try
                  (m/? (load-stored-bars opts window))
-                 (catch FileNotFoundException ex
+                 (catch FileNotFoundException _ex
                    (tc/dataset [])))
                (catch AssertionError ex
                  (error "append-only: interval:" interval opts aligned-source-window " exception: " ex))
@@ -125,7 +125,7 @@
            (try
              (let [stored-ds (try
                                (m/? (load-stored-bars opts window))
-                               (catch FileNotFoundException ex
+                               (catch FileNotFoundException _ex
                                  (tc/dataset [])))
                    import-window (missing-bars-window stored-ds calendar window)]
                (when import-window
@@ -133,7 +133,7 @@
                    (append-bars opts imported-ds)))
                (try
                  (m/? (load-stored-bars opts window))
-                 (catch FileNotFoundException ex
+                 (catch FileNotFoundException _ex
                    (tc/dataset []))))
              (catch AssertionError ex
                (error "append-only: assertion:" interval window opts " exception: " ex))

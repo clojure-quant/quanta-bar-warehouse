@@ -60,8 +60,7 @@
        tc/columns
        (map meta)
        (filter #(= col (:name %)))
-       empty?
-       not
+       (seq)
        ;(map :name)
        ))
 

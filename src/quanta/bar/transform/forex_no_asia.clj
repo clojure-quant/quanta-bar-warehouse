@@ -1,11 +1,11 @@
 (ns quanta.bar.transform.forex-no-asia
   (:require
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [info warn error]]
    [missionary.core :as m]
    [tablecloth.api :as tc]
    [tick.core :as t]
    [ta.calendar.validate :as cal]
-   [ta.db.bars.protocol :refer [barsource] :as b]
+   [quanta.bar.protocol :refer [barsource] :as b]
    [ta.calendar.calendars :refer [get-calendar] :as calendars]
    [quanta.bar.transform.helper :refer [load-stored-bars write-bars]])
   (:import (java.io FileNotFoundException)))
@@ -24,18 +24,18 @@
 ;NOTE: expects :forex calendar because the day-open? check is left out for performance reasons
 (defrecord transform-forex-no-asia []
   barsource
-  (get-bars [this opts window]
+  (get-bars [_this opts window]
     (m/sp
      (info "get-bars" (select-keys opts [:task-id :asset :calendar :import])
            "window:" (select-keys window [:start :end]))
      (try
-       (let [{:keys [calendar engine]} opts
+       (let [{:keys [calendar _engine]} opts
              to-calendar-kw :forex-no-asia               ; hardcoded
              to-interval-kw (cal/interval calendar)
              _ (info "filter calendar (forex-no-asia) - " calendar "-> [" to-calendar-kw to-interval-kw "]")
              _ (assert (cal/validate-calendar calendar))
              _ (assert (cal/validate-calendar [to-calendar-kw to-interval-kw]))
-             {:keys [open close timezone] :as to-calendar-spec} (get-calendar to-calendar-kw)
+             {:keys [open close timezone] :as _to-calendar-spec} (get-calendar to-calendar-kw)
              {:keys [n unit] :as interval-map} (parse-interval-kw to-interval-kw)
              _ (assert interval-map (str "interval-kw could not be parsed or to big: " interval-map))
              ; source calendar
@@ -56,7 +56,7 @@
          ;filtered-ds
          (try
            (m/? (load-stored-bars target-opt window))
-           (catch FileNotFoundException ex
+           (catch FileNotFoundException _ex
              (tc/dataset []))))
        (catch AssertionError ex
          (error "filter calendar (forex-no-asia) - assertion:" window opts " exception: " ex))

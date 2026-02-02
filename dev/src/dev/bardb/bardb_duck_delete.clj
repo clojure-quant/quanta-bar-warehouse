@@ -2,9 +2,8 @@
   (:require
    [tick.core :as t]
    [tablecloth.api :as tc]
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :as b]
    [quanta.bar.db.duckdb :as duck]
-   [ta.db.bars.dynamic.overview-db :refer [remove-asset]]
    [modular.system]))
 
 (def ddb (modular.system/system :bardb-dynamic))
@@ -12,5 +11,3 @@
 (def db (modular.system/system :duckdb))
 
 (duck/delete-bars db [:crypto :d] "ETHUSDT")
-
-(remove-asset (:overview-db ddb) {:asset "ETHUSDT" :calendar [:crypto :d]})

@@ -1,8 +1,8 @@
 (ns quanta.bar.engine
   (:require
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [info warn error]]
    [missionary.core :as m]
-   [ta.db.bars.protocol :as b :refer [barsource bardb]]))
+   [quanta.bar.protocol :as b :refer [barsource bardb]]))
 
 (defrecord bar-engine [imports dbs transforms]
   barsource
@@ -34,7 +34,7 @@
        (throw (ex-info "missing-import-bardb-transform" {:opts opts
                                                          :window window})))))
   bardb
-  (append-bars [this {:keys [bardb] :as opts} bar-ds]
+  (append-bars [_this {:keys [bardb] :as opts} bar-ds]
     (if-let [db (get dbs bardb)]
       (b/append-bars db (dissoc opts :import :bardb :transform) bar-ds)
       (throw (ex-info "unknown-bardb" {:bardb bardb

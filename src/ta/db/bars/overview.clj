@@ -1,6 +1,6 @@
 (ns ta.db.bars.overview
   (:require
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :as b]
    [tablecloth.api :as tc]))
 
 (defn- load-datasets [db opts window assets]

@@ -1,10 +1,10 @@
 (ns quanta.bar.compressor
   (:require
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [info warn error]]
    [missionary.core :as m]
    [tick.core :as t]
    [tablecloth.api :as tc]
-   [ta.db.bars.protocol  :as b]
+   [quanta.bar.protocol  :as b]
    [quanta.calendar.window :as w]
    [quanta.calendar.ds.compress :refer [compress-to-calendar]]
    [quanta.bar.db :refer [summary]]))

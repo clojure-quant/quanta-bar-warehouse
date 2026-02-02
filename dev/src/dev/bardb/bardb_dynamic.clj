@@ -3,7 +3,7 @@
    [tick.core :as t]
    [modular.system]
    [ta.calendar.core :as cal]
-   [ta.db.bars.protocol :as b]))
+   [quanta.bar.protocol :as b]))
 
 (def db (modular.system/system :bardb-dynamic))
 

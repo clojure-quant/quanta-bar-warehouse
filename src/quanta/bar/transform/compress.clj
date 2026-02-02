@@ -1,10 +1,9 @@
 (ns quanta.bar.transform.compress
   (:require
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [info warn error]]
    [de.otto.nom.core :as nom]
    [missionary.core :as m]
-   [tablecloth.api :as tc]
-   [ta.db.bars.protocol :refer [barsource] :as b]
+   [quanta.bar.protocol :refer [barsource] :as b]
    [ta.calendar.validate :as cal]
    [quanta.calendar.ds.compress :refer [compress-to-calendar]]
    [quanta.bar.transform.helper :refer [get-source-interval]]))

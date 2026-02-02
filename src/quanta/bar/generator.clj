@@ -2,11 +2,11 @@
   (:require
    [tick.core :as t]
    [missionary.core :as m]
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [info warn error]]
    [tablecloth.api :as tc]
    [quanta.calendar.interval :as i]
    [quanta.calendar.env.scheduler :refer [get-calendar-flow]]
-   [ta.db.bars.protocol :refer [append-bars]]
+   [quanta.bar.protocol :refer [append-bars]]
    [quanta.bar.generator.flow :refer [bar-f]]
    [quanta.bar.generator.util :refer [log-flow-to]]))
 
@@ -27,7 +27,7 @@
            {:bar-writer (log-flow-to "bars.log" generated-bar-f)})))
 
 (defn start-generating [{:keys [db]} trade-f calendar]
-  (let [[market-kw interval-kw] calendar
+  (let [[market-kw _interval-kw] calendar
         clock-t (m/rdv)
         calendar-f (get-calendar-flow calendar)
         dt-f (m/eduction (map i/current)
@@ -45,7 +45,7 @@
                               (info "bar-generator has written bars #: " (tc/row-count bar-ds))
                               (m/? (append-bars db {:calendar calendar} bar-ds))))
         bar-writer-t (m/reduce (fn [_s _v] nil) nil written-bar-f)
-        calendar-consumer-t (m/reduce (fn [s v] nil) nil calendar-done-f)
+        calendar-consumer-t (m/reduce (fn [_s _v] nil) nil calendar-done-f)
         runner-t (m/join vector bar-writer-t calendar-consumer-t)]
     (swap! state assoc market-kw
            {:runner (runner-t

@@ -2,11 +2,10 @@
 (ns quanta.bar.transform.shuffle
   (:require
    [de.otto.nom.core :as nom]
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
    [tech.v3.datatype.functional :as dfn]
    [tablecloth.api :as tc]
    [ta.indicator.returns :refer [forward-shift-col]]
-   [ta.db.bars.protocol :refer [barsource] :as b]))
+   [quanta.bar.protocol :refer [barsource] :as b]))
 
 (defn shuffle-bar-series [ds]
   (let [open  (-> ds :open dfn/log)
@@ -63,7 +62,7 @@
 
 (defrecord transform-shuffle []
   barsource
-  (get-bars [this opts window]
+  (get-bars [_this opts window]
     (let [engine (:engine opts)
           opts-clean (dissoc opts :engine)
           bar-ds (b/get-bars engine opts-clean window)]

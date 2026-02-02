@@ -1,7 +1,7 @@
 (ns dev.bargenerator.writer
   (:require
    [missionary.core :as m]
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :as b]
    [quanta.bar.db.textlogger :refer [start-textlogger]]
    [quanta.bar.db.duck :as duck]
    [quanta.bar.generator :refer [start-generating stop-generating]]

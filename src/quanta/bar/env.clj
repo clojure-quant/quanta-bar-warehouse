@@ -1,14 +1,13 @@
 (ns quanta.bar.env
   (:require
-   [taoensso.timbre :refer [trace debug info warn error]]
+   [taoensso.timbre :refer [trace info warn error]]
    [missionary.core :as m]
    [de.otto.nom.core :as nom]
-   [tick.core :as t]
    [tablecloth.api :as tc]
    [quanta.calendar.window :as w]
    [quanta.calendar.interval :as i]
-   [ta.db.bars.protocol :as b]
-   [ta.db.bars.aligned :as aligned]))
+   [quanta.bar.protocol :as b]
+   [quanta.bar.aligned :as aligned]))
 
 (defn get-bar-db [env]
   (let [bar-db (:bar-db env)]
@@ -97,7 +96,7 @@
      :good assets-good
      :bars bars-good}))
 
-(defn get-multiple-bars-trailing [env {:keys [calendar assets trailing-n] :as opts} last-interval]
+(defn get-multiple-bars-trailing [env {:keys [_calendar _assets trailing-n] :as opts} last-interval]
   (let [window (w/window-extend-left last-interval trailing-n)]
     (get-multiple-bars env opts window)))
 

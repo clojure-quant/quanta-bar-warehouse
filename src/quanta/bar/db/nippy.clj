@@ -2,13 +2,13 @@
   (:require
    [clojure.string :as str]
    [missionary.core :as m]
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [debug info error]]
    [tablecloth.api :as tc]
    [tick.core :as t]
-   [clojure.java.io :as java-io]
+   ;[clojure.java.io :as java-io]
    [tech.v3.io :as io]
    [babashka.fs :refer [create-dirs]]
-   [ta.db.bars.protocol :refer [bardb barsource]])
+   [quanta.bar.protocol :refer [bardb barsource]])
   (:import (java.io FileNotFoundException)))
 
 (defn save-ds [filename ds]
@@ -25,7 +25,7 @@
 (defn append-ds [filename ds]
   (let [existing-ds (try
                       (load-ds filename)
-                      (catch FileNotFoundException ex
+                      (catch FileNotFoundException _ex
                         (tc/dataset [])))]
     (debug "appending series " filename " count:" (tc/row-count ds) ", existing:" (tc/row-count existing-ds))
     (save-ds filename (tc/concat existing-ds ds))))

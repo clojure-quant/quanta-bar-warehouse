@@ -1,11 +1,11 @@
 (ns quanta.bar.db.duck
   (:require
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [info error]]
    [clojure.java.io :as java-io]
    [missionary.core :as m]
    [tmducken.duckdb :as duckdb]
    [quanta.calendar.window :refer [window->close-range]]
-   [ta.db.bars.protocol :refer [bardb barsource]]
+   [quanta.bar.protocol :refer [bardb barsource]]
    [quanta.bar.db :refer [bar-db]]
    [quanta.bar.db.duck.get-bars :refer [get-bars]]
    [quanta.bar.db.duck.append-bars :refer [append-bars]]
@@ -18,14 +18,19 @@
 (defn- exists-db? [db-filename]
   (.exists (java-io/file db-filename)))
 
+(defn find-duckdb-so []
+  (or (System/getenv "DUCKDB_LIB_DIR") "./binaries"))
+
 (defn- duckdb-start-impl [db-filename]
-  (duckdb/initialize! {:duckdb-home "./binaries"})
-  (let [new? (not (exists-db? db-filename))
-        db (duckdb/open-db db-filename)
-        conn (duckdb/connect db)]
-    {:db db
-     :conn conn
-     :new? new?}))
+  (let [duckdb-home (find-duckdb-so)]
+    (info "starting duckdb with duck-db-lib dir: " duckdb-home)
+    (duckdb/initialize! {:duckdb-home duckdb-home})
+    (let [new? (not (exists-db? db-filename))
+          db (duckdb/open-db db-filename)
+          conn (duckdb/connect db)]
+      {:db db
+       :conn conn
+       :new? new?})))
 
 (defn- duckdb-stop-impl [{:keys [conn] :as session}]
   (try

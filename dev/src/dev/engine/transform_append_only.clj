@@ -4,7 +4,7 @@
    [tick.core :as t]
    [tablecloth.api :as tc]
    [missionary.core :as m]
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :as b]
    [dev.env :refer [bar-engine]]
    [quanta.bar.preload :refer [import-bars]]))
 

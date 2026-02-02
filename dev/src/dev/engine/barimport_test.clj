@@ -2,7 +2,7 @@
   (:require
    [tick.core :as t]
    [ta.calendar.core :refer [trailing-range]]
-   [ta.db.bars.protocol :as b]
+   [quanta.bar.protocol :as b]
    [dev.env :refer [bar-engine]]
    [missionary.core :as m]))
 

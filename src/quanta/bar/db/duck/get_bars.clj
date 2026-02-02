@@ -1,6 +1,6 @@
 (ns quanta.bar.db.duck.get-bars
   (:require
-   [taoensso.timbre :as timbre :refer [debug info warn error]]
+   [taoensso.timbre :as timbre :refer [debug info error]]
    [tick.core :as t]
    [tablecloth.api :as tc]
    [tmducken.duckdb :as duckdb]
@@ -53,7 +53,7 @@
 (defn get-bars-window [session calendar asset dstart dend]
   (debug "get-bars-window " asset dstart dend)
   (let [query (sql-query-bars-for-asset-window calendar asset dstart dend)]
-    (info "sql-query: " query)
+    (debug "sql-query: " query)
     (-> (duckdb/sql->dataset (:conn session) query)
         (keywordize-columns))))
 

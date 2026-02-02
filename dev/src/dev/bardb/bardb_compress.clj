@@ -3,7 +3,7 @@
    [tick.core :as t]
    [tablecloth.api :as tc]
    [modular.system]
-   [ta.db.bars.protocol :as b]))
+   [quanta.bar.protocol :as b]))
 
 (def db (modular.system/system :bardb-dynamic-compressing))
 
