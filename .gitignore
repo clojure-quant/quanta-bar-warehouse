@@ -1,8 +1,9 @@
 .cpcache
-.clj-kondo
-# explicitly re-includes that file
+.clj-kondo/**
+!.clj-kondo/
 !.clj-kondo/config.edn
-.lsp/
+.lsp/**
+!.lsp/
 !.lsp/config.edn
 .nrepl-port
 .calva
