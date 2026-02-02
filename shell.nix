@@ -4,7 +4,7 @@
   }) {} }:
 
 pkgs.mkShell {
-  buildInputs = [pkgs.duckdb.lib pkgs.nix-index];
+  buildInputs = [pkgs.duckdb.lib];
   
   shellHook = ''
     export DUCKDB_LIB_DIR=${pkgs.duckdb.lib}/lib

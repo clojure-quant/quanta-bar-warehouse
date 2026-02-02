@@ -1,0 +1,6 @@
+{:linters
+ {:clojure-lsp/unused-public-var {:exclude [quanta.bar.db.duck]
+                                  :level :off}
+  }}
+
+
