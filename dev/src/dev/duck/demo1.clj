@@ -2,94 +2,91 @@
   (:require
    [tick.core :as t]
    [missionary.core :as m]
+   [tech.v3.dataset :as tds]
    [tablecloth.api :as tc]
-   [quanta.bar.protocol :as b]
    [quanta.calendar.window :as w]
+   [quanta.bar.protocol :as b]
    [quanta.bar.db.duck :as duck]
-   [quanta.bar.db.duck.warehouse :as wh]
-   [quanta.bar.compressor :refer [compress]]
-   [quanta.bar.db.duck.delete :as d]
-   [quanta.bar.db.duck.admin :as admin]))
+   [quanta.bar.db.duck.warehouse :as wh]))
 
-(def db (duck/start-bardb-duck "duck11.ddb"))
+(def stocks
+  (tds/->dataset "https://github.com/techascent/tech.ml.dataset/raw/master/test/data/stocks.csv"
+                 {:key-fn keyword
+                  :dataset-name :stocks}))
+(tc/info stocks)
 
-(def db (duck/start-bardb-duck "random-quotes.ddb"))
+;; this format needs to be patched, so we can save it 
+; symbol  -> asset
+; date - date needs to become an instant at midnight
+; price  -> open/high/low/close and zero volume
 
-db
+(defn add-datetime [d]
+  (-> d
+      (t/date)
+      (t/at  (t/midnight)) ; LocalDateTime at 00:00
+      (t/in "UTC")         ; ZonedDateTime in UTC
+      t/instant))          ; Instant
 
-(duck/stop-bardb-duck db)
+(def stocks-import
+  (-> stocks
+      (tc/rename-columns {:symbol :asset})
+      (tc/add-columns
+       {:date (map add-datetime (:date stocks))
+        :open (:price stocks)
+        :high (:price stocks)
+        :low (:price stocks)
+        :close (:price stocks)
+        :volume 0.0})))
 
-(wh/get-data-range db [:us :d] "XXX")
-
-(admin/checkpoint db)
-(admin/db-size db)
-
-(wh/warehouse-summary db [:crypto :m])
-(wh/warehouse-summary db [:crypto :h])
-
-(d/delete-bars-asset-dt db [:us :d] "XXX" (t/instant "2022-03-05T00:00:00.000Z"))
-(d/delete-bars-asset-dt db [:us :d] "XXX" (t/instant "2022-03-06T20:00:00Z"))
-(t/instant)
-
-(d/delete-calendar db [:crypto :h])
-
-(m/?
- (compress db {:calendar-from [:crypto :m]
-               :calendar-to [:crypto :h]}))
-
-(m/? (b/get-bars db {:asset "A"}
-                 (w/date-range->window [:crypto :m]
-                                       {:start (t/instant "2025-03-04T00:00:00Z")
-                                        :end (t/instant "2025-03-06T20:00:00Z")})))
-
-(m/? (b/get-bars db {:asset "A"}
-                 (w/date-range->window [:crypto :h]
-                                       {:start (t/instant "2025-03-04T00:00:00Z")
-                                        :end (t/instant "2025-03-06T20:00:00Z")})))
-
-(def bar-ds
-  (-> {:date [(t/instant "2022-03-05T00:00:00Z")
-              (t/instant "2023-03-06T20:00:00Z")
-              (t/instant "2024-03-06T20:00:00Z")
-              (t/instant "2025-03-05T22:00:00Z")]
-       :open [10.0 20.0 30.0 40.0]
-       :high [10.0 20.0 30.0 40.0]
-       :low [10.0 20.0 30.0 40.0]
-       :close [10.0 20.0 30.0 40.0]
-       :volume [10.0 20.0 30.0 40.0]
-       :asset "XXX"}
-      tc/dataset))
-
-bar-ds
+(def db (duck/start-bardb-duck "stocks.ddb"))
 
 (m/? (b/append-bars db {:asset "XXX"
                         :calendar [:us :d]}
-                    bar-ds))
+                    stocks-import))
 
-(m/? (b/get-bars db {:asset "XXX"}
+(wh/warehouse-summary db [:us :d])
+
+(m/? (b/get-bars db
+                 {:asset "GOOG"}
                  (w/date-range->window [:us :d]
-                                       {:start (t/instant "2021-03-05T00:00:00Z")
-                                        :end (t/instant "2025-03-06T20:00:00Z")})))
+                                       {:start (t/instant "2005-01-01T00:00:00Z")
+                                        :end (t/instant "2010-03-01T20:00:00Z")})))
 
-(->  (w/date-range->window [:us :d]
-                           {:start (t/instant "2021-03-05T22:00:00Z")
-                            :end (t/instant "2025-03-05T22:00:00Z")})
-     (w/window->close-range))
+(m/? (b/get-bars db
+                 {:asset "GOOG"
+                  :calendar [:us :d]}
+                 {:start (t/instant "2005-01-01T00:00:00Z")
+                  :end (t/instant "2010-03-01T20:00:00Z")}))
 
-(m/? (b/get-bars db {:asset "XXX"}
-                 (w/date-range->window [:us :d]
-                                       {:start (t/instant "2025-03-05T22:00:00Z")
-                                        :end (t/instant "2025-03-05T22:00:00Z")})))
+(m/? (b/get-bars db
+                 {:asset "GOOG"
+                  :calendar [:us :d]}
+                 {; entire series
+                  }))
+(m/? (b/get-bars db
+                 {:asset "GOOG"
+                  :calendar [:us :d]}
+                 {:start (t/instant "2007-01-01T00:00:00Z")
+                  ; starting in 2007
+                  }))
 
-; unknown dataset
-(m/? (b/get-bars db {:asset "EUR/USD"}
-                 (w/date-range->window [:forex :d]
-                                       {:start (t/instant "2021-03-05T00:00:00Z")
-                                        :end (t/instant "2025-03-06T20:00:00Z")})))
+(m/? (b/get-bars db
+                 {:asset "GOOG"
+                  :calendar [:us :d]}
+                 {:end (t/instant "2009-01-01T00:00:00Z")
+                  ; ending in 2009
+                  }))
 
-(require '[tech.v3.dataset :as ds])
-(def stocks
-  (ds/->dataset "https://github.com/techascent/tech.ml.dataset/raw/master/test/data/stocks.csv"
-                {:key-fn keyword
-                 :dataset-name :stocks}))
-(tc/info stocks)
+(m/? (b/get-bars db
+                 {:asset "GOOG"
+                  :calendar [:us :d]}
+                 {:end (t/instant "2009-01-01T00:00:00Z")
+                  :n 10
+                  ; ending in 2009
+                  }))
+(wh/warehouse-summary db [:us :d])
+(m/? (b/delete-bars db {:asset "AMZN"
+                        :calendar [:us :d]}))
+(wh/warehouse-summary db [:us :d])
+
+(duck/stop-bardb-duck db)

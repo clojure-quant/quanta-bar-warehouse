@@ -1,8 +1,12 @@
 {:paths ["src"]
  :deps
  {org.clojure/clojure    {:mvn/version "1.11.3"}
-  io.github.clojure-quant/quanta-market {:mvn/version "0.6.162"} ; protocols and barsource feeds
+  ;io.github.clojure-quant/quanta-market {:mvn/version "0.6.162"} ; protocols and barsource feeds
   io.github.clojure-quant/quanta-bar-warehouse {:local/root ".." :deps/manifest :deps}}
  :aliases
- {;
+ {:nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.1.0"}}
+          :main-opts  ["-m" "nrepl.cmdline" "--port" "7888"]}
+  
+  
+  ;
   }}

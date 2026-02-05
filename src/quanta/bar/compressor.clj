@@ -7,7 +7,7 @@
    [quanta.bar.protocol  :as b]
    [quanta.calendar.window :as w]
    [quanta.calendar.ds.compress :refer [compress-to-calendar]]
-   [quanta.bar.db :refer [summary]]))
+   ))
 
 (defn table-dict [ds]
   (if ds
@@ -32,8 +32,8 @@
                                      calendar-to]}]
   (m/sp
    (info "compressing from: " calendar-from " to: " calendar-to)
-   (let [summary-from (m/? (summary bar-db {:calendar calendar-from}))
-         summary-to (m/? (summary bar-db {:calendar calendar-to}))
+   (let [summary-from (m/? (b/summary bar-db {:calendar calendar-from}))
+         summary-to (m/? (b/summary bar-db {:calendar calendar-to}))
          dict-from (table-dict summary-from)
          dict-to (table-dict summary-to)]
      (->> dict-from

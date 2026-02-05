@@ -6,7 +6,6 @@
    [tmducken.duckdb :as duckdb]
    [quanta.calendar.window :refer [window->close-range]]
    [quanta.bar.protocol :refer [bardb barsource]]
-   [quanta.bar.db :refer [bar-db]]
    [quanta.bar.db.duck.get-bars :refer [get-bars]]
    [quanta.bar.db.duck.append-bars :refer [append-bars]]
    [quanta.bar.db.duck.delete :refer [delete-bars]]
@@ -47,21 +46,24 @@
     (m/sp
      (m/holding
       lock
-      (let [w (window->close-range window)]
-        (info "get-bars " (select-keys opts [:asset :calendar]) w)
-        (m/? (m/via m/blk (get-bars this opts w)))))))
+       (let [_ (println "asdfasdfasdfasdf")
+             ; allow to pass in a calendar/window which does not have :start :end
+             window (if (:window window)
+                       (window->close-range window)
+                       window)]
+          (info "get-bars " (select-keys opts [:asset :calendar]) window)
+          (m/? (m/via m/blk (get-bars this opts window)))))))
   bardb
   (append-bars [this opts ds-bars]
     (m/via m/blk (m/holding lock (append-bars  this opts ds-bars))))
-  bar-db
-  (summary [this opts]
-    (m/via m/blk
-           (m/holding lock
-                      (warehouse-summary this (:calendar opts)))))
   (delete-bars [this opts]
     (m/via m/blk
            (m/holding lock
-                      (delete-bars this (:calendar opts) (:asset opts))))))
+                      (delete-bars this (:calendar opts) (:asset opts)))))
+  (summary [this opts]
+    (m/via m/blk
+           (m/holding lock
+                      (warehouse-summary this (:calendar opts))))))
 
 (defn start-bardb-duck [opts]
   (let [{:keys [db conn new?] :as this} (duckdb-start-impl opts)

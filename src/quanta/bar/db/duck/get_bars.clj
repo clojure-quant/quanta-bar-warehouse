@@ -42,6 +42,36 @@
     (-> (duckdb/sql->dataset (:conn session) query)
         (keywordize-columns))))
 
+(defn sql-query-bars-for-asset-until 
+  ([calendar asset until]
+   (let [table-name (bar-category->table-name calendar)]
+     (str "select * from " table-name
+          " where asset = '" asset "'"
+          " and date <= '" until "'"
+          " order by date")))
+  ([calendar asset until n]
+   (let [table-name (bar-category->table-name calendar)]
+     (str "select * from " table-name
+          " where asset = '" asset "'"
+          " and date <= '" until "'"
+          " order by date desc"
+          " limit " n))))
+
+(defn get-bars-until 
+  ([session calendar asset until]
+   (debug "get-bars-until " asset until)
+   (let [query (sql-query-bars-for-asset-until calendar asset until)]
+     (-> (duckdb/sql->dataset (:conn session) query)
+         (keywordize-columns))))
+  ([session calendar asset until n]
+  (debug "get-bars-until " asset until n)
+  (let [query (sql-query-bars-for-asset-until calendar asset until n)]
+    (-> (duckdb/sql->dataset (:conn session) query)
+        (keywordize-columns)
+        (tc/order-by :date)
+        ))))
+
+
 (defn sql-query-bars-for-asset-window [calendar asset dstart dend]
   (let [table-name (bar-category->table-name calendar)]
     (str "select * from " table-name
@@ -64,21 +94,31 @@
       (t/instant dt))))
 
 (defn get-bars
-  "returns bar-ds for asset/calendar + window
-   returns nom anomaly if there are no bars in the dataset."
-  [session {:keys [asset] :as opts} {:keys [calendar start end] :as window}]
+  "returns bar-ds for asset/calendar + window"
+  [session {:keys [asset] :as opts} {:keys [calendar start end n] :as window}]
   (try
-    (let [; v0.10 of tmlducken cannot do queries with date
-          ; being zoned-datetime
+    (let [;tmlducken v0.10 cannot do queries with date being zoned-datetime
           start (ensure-instant start)
           end (ensure-instant end)
+          calendar (or calendar (:calendar opts))
           bar-ds (cond
+                   ; start-end window
                    (and start end)
                    (get-bars-window session calendar asset start end)
 
+                   ; starting >>
                    start
                    (get-bars-since session calendar asset start)
 
+                   
+                   ; end 
+                   (and end n)
+                   (get-bars-until session calendar asset end n)
+
+                   end
+                   (get-bars-until session calendar asset end)
+                   
+                   ; entire history
                    :else
                    (get-bars-full session calendar asset))]
       (cond
@@ -88,8 +128,8 @@
         :else
         bar-ds))
     (catch Exception ex
-      (error "get-bars " (select-keys opts [:task-id :asset :calendar :import])
-             " window: " (select-keys window [:start :end])
+      (error "get-bars "  opts 
+             " window: " window 
              "exception: " ex)
-      (throw (ex-info "get-bars duckdb" {:window (select-keys window [:start :end])
-                                         :opts (select-keys opts [:asset :calendar])})))))
+      (throw (ex-info "get-bars duckdb" {:window window
+                                         :opts opts})))))

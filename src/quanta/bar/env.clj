@@ -40,7 +40,7 @@
 (defn get-trailing-bars [env {:keys [trailing-n] :as opts} last-interval]
   (info "get-trailing" trailing-n " bars ending: " (-> last-interval i/current :close))
   (m/sp
-   (let [calendar (get-calendar opts)
+   (let [calendar (get-cal endar opts)
          window (w/window-extend-left last-interval trailing-n)
          bar-ds (m/? (get-bars env opts window))]
      (if (= 0 (tc/row-count bar-ds))

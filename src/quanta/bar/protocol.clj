@@ -5,4 +5,6 @@
 
 (defprotocol bardb
   ;(get-bars [this opts window])
-  (append-bars [this opts ds-bars]))
+  (append-bars [this opts ds-bars])
+  (delete-bars [this opts])
+  (summary [this opts]))
