@@ -46,13 +46,13 @@
     (m/sp
      (m/holding
       lock
-       (let [_ (println "asdfasdfasdfasdf")
+      (let [_ (println "asdfasdfasdfasdf")
              ; allow to pass in a calendar/window which does not have :start :end
-             window (if (:window window)
-                       (window->close-range window)
-                       window)]
-          (info "get-bars " (select-keys opts [:asset :calendar]) window)
-          (m/? (m/via m/blk (get-bars this opts window)))))))
+            window (if (:window window)
+                     (window->close-range window)
+                     window)]
+        (info "get-bars " (select-keys opts [:asset :calendar]) window)
+        (m/? (m/via m/blk (get-bars this opts window)))))))
   bardb
   (append-bars [this opts ds-bars]
     (m/via m/blk (m/holding lock (append-bars  this opts ds-bars))))

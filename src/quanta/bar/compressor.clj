@@ -6,8 +6,7 @@
    [tablecloth.api :as tc]
    [quanta.bar.protocol  :as b]
    [quanta.calendar.window :as w]
-   [quanta.calendar.ds.compress :refer [compress-to-calendar]]
-   ))
+   [quanta.calendar.ds.compress :refer [compress-to-calendar]]))
 
 (defn table-dict [ds]
   (if ds

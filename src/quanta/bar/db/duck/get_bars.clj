@@ -42,7 +42,7 @@
     (-> (duckdb/sql->dataset (:conn session) query)
         (keywordize-columns))))
 
-(defn sql-query-bars-for-asset-until 
+(defn sql-query-bars-for-asset-until
   ([calendar asset until]
    (let [table-name (bar-category->table-name calendar)]
      (str "select * from " table-name
@@ -57,20 +57,18 @@
           " order by date desc"
           " limit " n))))
 
-(defn get-bars-until 
+(defn get-bars-until
   ([session calendar asset until]
    (debug "get-bars-until " asset until)
    (let [query (sql-query-bars-for-asset-until calendar asset until)]
      (-> (duckdb/sql->dataset (:conn session) query)
          (keywordize-columns))))
   ([session calendar asset until n]
-  (debug "get-bars-until " asset until n)
-  (let [query (sql-query-bars-for-asset-until calendar asset until n)]
-    (-> (duckdb/sql->dataset (:conn session) query)
-        (keywordize-columns)
-        (tc/order-by :date)
-        ))))
-
+   (debug "get-bars-until " asset until n)
+   (let [query (sql-query-bars-for-asset-until calendar asset until n)]
+     (-> (duckdb/sql->dataset (:conn session) query)
+         (keywordize-columns)
+         (tc/order-by :date)))))
 
 (defn sql-query-bars-for-asset-window [calendar asset dstart dend]
   (let [table-name (bar-category->table-name calendar)]
@@ -110,14 +108,13 @@
                    start
                    (get-bars-since session calendar asset start)
 
-                   
-                   ; end 
+; end 
                    (and end n)
                    (get-bars-until session calendar asset end n)
 
                    end
                    (get-bars-until session calendar asset end)
-                   
+
                    ; entire history
                    :else
                    (get-bars-full session calendar asset))]
@@ -128,8 +125,8 @@
         :else
         bar-ds))
     (catch Exception ex
-      (error "get-bars "  opts 
-             " window: " window 
+      (error "get-bars "  opts
+             " window: " window
              "exception: " ex)
       (throw (ex-info "get-bars duckdb" {:window window
                                          :opts opts})))))
