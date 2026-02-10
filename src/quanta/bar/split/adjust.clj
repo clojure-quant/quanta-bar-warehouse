@@ -60,12 +60,12 @@
        ))
 
 (defn split-adjust [bar-ds split-ds]
-  (let [{:keys [open high low close factor] :as ds} (add-split-factor-linear bar-ds split-ds)]
+  (let [{:keys [open high low close volume factor] :as ds} (add-split-factor-linear bar-ds split-ds)]
     (tc/add-columns ds
                     {:open (dfn// open factor)
                      :high (dfn// high factor)
                      :low (dfn// low factor)
                      :close (dfn// close factor)
-                     :volume (dfn/* close factor)})))
+                     :volume (dfn/* volume factor)})))
 
 
