@@ -41,7 +41,7 @@
                                      (if
                                        ; new split 
                                       (and (>= split-idx-new 0)
-                                           (t/>= (split-dates split-idx-new) d))
+                                           (t/> (split-dates split-idx-new) d))
                                        (recur (dec split-idx-new) (* cum-factor-new (split-facs split-idx-new)))
                                        ; keep existing value
                                        [split-idx-new cum-factor-new]))]
@@ -62,10 +62,10 @@
 (defn split-adjust [bar-ds split-ds]
   (let [{:keys [open high low close factor] :as ds} (add-split-factor-linear bar-ds split-ds)]
     (tc/add-columns ds
-                    {:open (dfn/* open factor)
-                     :high (dfn/* high factor)
-                     :low (dfn/* low factor)
-                     :close (dfn/* close factor)
-                     :volume (dfn// close factor)})))
+                    {:open (dfn// open factor)
+                     :high (dfn// high factor)
+                     :low (dfn// low factor)
+                     :close (dfn// close factor)
+                     :volume (dfn/* close factor)})))
 
 
