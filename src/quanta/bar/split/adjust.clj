@@ -33,7 +33,7 @@
            cum-factor 1.0]
 
       (let [d (bar-dates bar-idx)
-            _ (println "bar-idx: " bar-idx " date: " d)
+            ;_ (println "bar-idx: " bar-idx " date: " d)
               ;; apply all splits that happen exactly on this bar date
               ;; (handles multiple splits same day)
             [split-idx cum-factor] (loop [split-idx-new split-idx
