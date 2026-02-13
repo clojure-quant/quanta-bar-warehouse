@@ -7,7 +7,8 @@
    [tick.core :as t]
    ;[clojure.java.io :as java-io]
    [tech.v3.io :as io]
-   [babashka.fs :refer [create-dirs]]
+   [babashka.fs :as fs :refer [create-dirs]]
+   [quanta.bar.db.nippy.overview :refer [get-existing-assets create-summary]]
    [quanta.bar.protocol :refer [bardb barsource]])
   (:import (java.io FileNotFoundException)))
 
@@ -45,7 +46,7 @@
         (or (not end) (t/<= date end)))))))
 
 (defn get-bars-nippy [this opts window]
-  (info "get-bars " opts window)
+  (debug "get-bars " opts window)
   (-> (load-ds (filename-asset this opts))
       (tc/add-column :asset (:asset opts))
       (filter-range window)))
@@ -57,15 +58,31 @@
 
     (save-ds (filename-asset this opts) ds-bars)))
 
+(defn summary-nippy [this calendar]
+  (let [window {}
+        assets (get-existing-assets (:base-path this) calendar)
+        ds-seq (map (fn [asset]
+                      (get-bars-nippy this {:asset asset :calendar calendar} window))
+                    assets)
+        summary-ds (apply tc/concat ds-seq)]
+    (create-summary summary-ds)))
+
 (defrecord bardb-nippy [base-path]
   barsource
   (get-bars [this opts window]
     (m/via m/blk (get-bars-nippy this opts window)))
   bardb
   (append-bars [this opts bar-ds]
-    (m/via m/blk (append-bars-nippy this opts bar-ds))))
+    (m/via m/blk (append-bars-nippy this opts bar-ds)))
+  (delete-bars [this opts]
+    (m/sp
+     (let [f (filename-asset this opts)]
+       (fs/delete-if-exists f))))
+  (summary [this opts]
+    (m/sp
+     (summary-nippy this (:calendar opts)))))
 
 (defn start-bardb-nippy [base-path]
-  (debug "creating dir: " base-path)
+  (info "nippy start base-path: " base-path)
   (create-dirs base-path)
   (bardb-nippy. base-path))

@@ -1,8 +1,9 @@
 (ns quanta.bar.db.duck
   (:require
-   [taoensso.timbre :as timbre :refer [info error]]
+   [taoensso.timbre :as timbre :refer [debug info error]]
    [clojure.java.io :as java-io]
    [missionary.core :as m]
+   [babashka.fs :as fs]
    [tmducken.duckdb :as duckdb]
    [quanta.calendar.window :refer [window->close-range]]
    [quanta.bar.protocol :refer [bardb barsource]]
@@ -23,6 +24,8 @@
 (defn- duckdb-start-impl [db-filename]
   (let [duckdb-home (find-duckdb-so)]
     (info "starting duckdb with duck-db-lib dir: " duckdb-home)
+    (when-not (fs/exists? duckdb-home)
+      (throw (ex-info "duckdb-dll-path not found. Set DUCKDB_LIB_DIR env var or ./binaries " {})))
     (duckdb/initialize! {:duckdb-home duckdb-home})
     (let [new? (not (exists-db? db-filename))
           db (duckdb/open-db db-filename)
@@ -46,12 +49,11 @@
     (m/sp
      (m/holding
       lock
-      (let [_ (println "asdfasdfasdfasdf")
-             ; allow to pass in a calendar/window which does not have :start :end
+      (let [; allow to pass in a calendar/window which does not have :start :end
             window (if (:window window)
                      (window->close-range window)
                      window)]
-        (info "get-bars " (select-keys opts [:asset :calendar]) window)
+        (debug "get-bars " (select-keys opts [:asset :calendar]) window)
         (m/? (m/via m/blk (get-bars this opts window)))))))
   bardb
   (append-bars [this opts ds-bars]

@@ -1,7 +1,8 @@
 {:paths ["src"]
  :deps
- {org.clojure/clojure    {:mvn/version "1.11.3"}
-  ;io.github.clojure-quant/quanta-market {:mvn/version "0.6.162"} ; protocols and barsource feeds
+ {org.clojure/clojure    {:mvn/version "1.12.4"}
+  org.pinkgorilla/modular {:mvn/version "0.3.73"} ; env path
+  org.pinkgorilla/timbre {:mvn/version "0.0.8"} ; timbre config
   io.github.clojure-quant/quanta-bar-warehouse {:local/root ".." :deps/manifest :deps}}
  :aliases
  {:nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.1.0"}}

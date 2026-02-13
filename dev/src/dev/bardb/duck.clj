@@ -1,4 +1,4 @@
-(ns dev.duck.demo1
+(ns dev.bardb.duck
   (:require
    [tick.core :as t]
    [missionary.core :as m]
@@ -7,7 +7,8 @@
    [quanta.calendar.window :as w]
    [quanta.bar.protocol :as b]
    [quanta.bar.db.duck :as duck]
-   [quanta.bar.db.duck.warehouse :as wh]))
+   [quanta.bar.db.duck.warehouse :as wh]
+   [dev.env :refer [bardbduck]]))
 
 (def stocks
   (tds/->dataset "https://github.com/techascent/tech.ml.dataset/raw/master/test/data/stocks.csv"
@@ -38,55 +39,64 @@
         :close (:price stocks)
         :volume 0.0})))
 
-(def db (duck/start-bardb-duck "stocks.ddb"))
-
-(m/? (b/append-bars db {:asset "XXX"
-                        :calendar [:us :d]}
+(m/? (b/append-bars bardbduck {:asset "XXX"
+                               :calendar [:us :d]}
                     stocks-import))
 
-(wh/warehouse-summary db [:us :d])
+(wh/warehouse-summary bardbduck [:us :d])
 
-(m/? (b/get-bars db
+(m/? (b/get-bars bardbduck
                  {:asset "GOOG"}
                  (w/date-range->window [:us :d]
                                        {:start (t/instant "2005-01-01T00:00:00Z")
                                         :end (t/instant "2010-03-01T20:00:00Z")})))
 
-(m/? (b/get-bars db
+(m/? (b/get-bars bardbduck
                  {:asset "GOOG"
                   :calendar [:us :d]}
                  {:start (t/instant "2005-01-01T00:00:00Z")
                   :end (t/instant "2010-03-01T20:00:00Z")}))
 
-(m/? (b/get-bars db
+(m/? (b/get-bars bardbduck
                  {:asset "GOOG"
                   :calendar [:us :d]}
                  {; entire series
                   }))
-(m/? (b/get-bars db
+
+(m/? (b/get-bars bardbduck
                  {:asset "GOOG"
                   :calendar [:us :d]}
                  {:start (t/instant "2007-01-01T00:00:00Z")
                   ; starting in 2007
                   }))
 
-(m/? (b/get-bars db
+(m/? (b/get-bars bardbduck
                  {:asset "GOOG"
                   :calendar [:us :d]}
                  {:end (t/instant "2009-01-01T00:00:00Z")
                   ; ending in 2009
                   }))
 
-(m/? (b/get-bars db
+(m/? (b/get-bars bardbduck
                  {:asset "GOOG"
                   :calendar [:us :d]}
                  {:end (t/instant "2009-01-01T00:00:00Z")
                   :n 10
                   ; ending in 2009
                   }))
-(wh/warehouse-summary db [:us :d])
-(m/? (b/delete-bars db {:asset "AMZN"
-                        :calendar [:us :d]}))
-(wh/warehouse-summary db [:us :d])
 
-(duck/stop-bardb-duck db)
+; test for unknown asset
+(b/get-bars bardbduck
+            {:asset "AEE.AU"
+             :calendar [:us :d]
+             :import :kibot}
+            window)
+
+(wh/warehouse-summary bardbduck [:us :d])
+
+(m/? (b/delete-bars bardbduck {:asset "AMZN"
+                               :calendar [:us :d]}))
+
+(wh/warehouse-summary bardbduck [:us :d])
+
+
