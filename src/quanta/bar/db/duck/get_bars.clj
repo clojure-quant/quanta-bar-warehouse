@@ -1,6 +1,5 @@
 (ns quanta.bar.db.duck.get-bars
-  (:require
-   [taoensso.timbre :as timbre :refer [debug info error]]
+  (:require 
    [tick.core :as t]
    [tablecloth.api :as tc]
    [tmducken.duckdb :as duckdb]
@@ -124,9 +123,6 @@
 
         :else
         bar-ds))
-    (catch Exception ex
-      (error "get-bars "  opts
-             " window: " window
-             "exception: " ex)
+    (catch Exception ex 
       (throw (ex-info "get-bars duckdb" {:window window
                                          :opts opts})))))
