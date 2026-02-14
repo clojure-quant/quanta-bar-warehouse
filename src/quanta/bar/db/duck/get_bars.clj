@@ -1,5 +1,5 @@
 (ns quanta.bar.db.duck.get-bars
-  (:require 
+  (:require
    [tick.core :as t]
    [tablecloth.api :as tc]
    [tmducken.duckdb :as duckdb]
@@ -23,7 +23,6 @@
     (str "select * from " table-name " where asset = '" asset "' order by date")))
 
 (defn get-bars-full [session calendar asset]
-  (debug "get-bars " asset)
   (let [query (sql-query-bars-for-asset calendar asset)]
     (-> (duckdb/sql->dataset (:conn session) query)
         (keywordize-columns))))
@@ -36,7 +35,6 @@
          " order by date")))
 
 (defn get-bars-since [session calendar asset since]
-  (debug "get-bars-since " asset since)
   (let [query (sql-query-bars-for-asset-since calendar asset since)]
     (-> (duckdb/sql->dataset (:conn session) query)
         (keywordize-columns))))
@@ -58,12 +56,10 @@
 
 (defn get-bars-until
   ([session calendar asset until]
-   (debug "get-bars-until " asset until)
    (let [query (sql-query-bars-for-asset-until calendar asset until)]
      (-> (duckdb/sql->dataset (:conn session) query)
          (keywordize-columns))))
   ([session calendar asset until n]
-   (debug "get-bars-until " asset until n)
    (let [query (sql-query-bars-for-asset-until calendar asset until n)]
      (-> (duckdb/sql->dataset (:conn session) query)
          (keywordize-columns)
@@ -78,9 +74,7 @@
          " order by date")))
 
 (defn get-bars-window [session calendar asset dstart dend]
-  (debug "get-bars-window " asset dstart dend)
   (let [query (sql-query-bars-for-asset-window calendar asset dstart dend)]
-    (debug "sql-query: " query)
     (-> (duckdb/sql->dataset (:conn session) query)
         (keywordize-columns))))
 
@@ -123,6 +117,6 @@
 
         :else
         bar-ds))
-    (catch Exception ex 
+    (catch Exception _ex
       (throw (ex-info "get-bars duckdb" {:window window
                                          :opts opts})))))
