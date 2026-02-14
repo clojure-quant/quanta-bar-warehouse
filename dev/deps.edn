@@ -1,6 +1,7 @@
 {:paths ["src"]
  :deps
  {org.clojure/clojure    {:mvn/version "1.12.4"}
+  nano-id/nano-id {:mvn/version "1.1.0"}
   org.pinkgorilla/modular {:mvn/version "0.3.73"} ; env path
   org.pinkgorilla/timbre {:mvn/version "0.0.8"} ; timbre config
   io.github.clojure-quant/quanta-bar-warehouse {:local/root ".." :deps/manifest :deps}}

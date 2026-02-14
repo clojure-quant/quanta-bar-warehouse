@@ -4,7 +4,8 @@
    [modular.log :refer [timbre-config!]]
    [quanta.bar.db.nippy :as nippy]
    [quanta.bar.db.duck :as duck]
-   [quanta.bar.split.service :refer [start-split-service]]))
+   [quanta.bar.split.service :refer [start-split-service]]
+   [quanta.bar.db.random :refer [start-random-bar-source]]))
 
 (timbre-config!
  {:min-level [[#{"org.eclipse.jetty.*"} :warn]
@@ -18,4 +19,7 @@
 
 (def ss (start-split-service {:bardb bardbduck}))
 
+(def rs (start-random-bar-source {:seed 42
+                                  :zero-price 100.0}))
 
+rs

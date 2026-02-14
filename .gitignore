@@ -17,3 +17,6 @@ dev/binaries
 .eastwood
 binaries
 classes
+dev/.clj-kondo/
+dev/.lsp/
+dev/duck-perf/
