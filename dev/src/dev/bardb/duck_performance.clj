@@ -48,7 +48,7 @@
 
 (defn create-partition-table [conn table-name from to]
   (format " CREATE TABLE %s PARTITION OF %s
-                                          FOR VALUES FROM ('%s') TO ('%s');",
+            FOR VALUES FROM ('%s') TO ('%s');",
           (str table-name "_" from)
           table-name
           from
@@ -57,29 +57,3 @@
 (defn create-hive-partition-by-asset [conn table-name path]
   (str "COPY " table-name "
           TO '" path "' (FORMAT PARQUET, PARTITION_BY (asset));"))
-
-(comment
-; create databases
-  (create-new-db base-path {:assets 1 :years 1} [:crypto :m])     ; 12 MB
-  (create-new-db base-path {:assets 100 :years 10} [:crypto :m])  ; 11 GB
-
-  (create-new-db base-path {:assets 1 :years 10} [:crypto :m])    ; 110 MB
-  (create-new-db base-path {:assets 1 :years 100} [:crypto :m])   ; 1.1 GB
-
-  (create-new-db base-path {:assets 10 :years 1} [:crypto :m])    ; 114 MB
-  (create-new-db base-path {:assets 100 :years 1} [:crypto :m])   ; 1.1 GB
-  (create-new-db base-path {:assets 1000 :years 1} [:crypto :m])  ; 11 GB
-
-  (defn performance-test
-    [_]
-    (time (series-generate-save-reload 2000 "small"))
-    (time (series-generate-save-reload 20000 "big")) ; tradingview limit
-    (time (series-generate-save-reload 200000 "huge"))
-    (time (series-generate-save-reload 2000000 "gigantic"))))
- ;; results
-  ; 500k bars x 1 asset 1y = 1.628 | 2.597 sec
-  ; 500k bars x 10 asset 1y =  1.5 | 1.7 sec
-  ; 500k bars x 1000 asset 1y = 2.0 | 2.3 | 3.2 sec
-
-  ; 5mio  bars x 1 asset 10y = 16.71 sec
-  ; 50mio bars x 1 asset 100y = 274.860 sec
