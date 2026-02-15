@@ -1,10 +1,10 @@
-(ns quanta.bar.db.duck.ds
+(ns quanta.bar.db.duck.impl.ds
   (:require
    [clojure.set :refer [subset?]]
    [tick.core :as t]
    [tablecloth.api :as tc]
    [tech.v3.dataset :as tds]
-   [quanta.bar.db.duck.calendar :refer [bar-category->table-name]]))
+   [quanta.bar.db.duck.impl.calendar :refer [bar-category->table-name]]))
 
 (defn empty-ds [calendar]
   (let [table-name (bar-category->table-name calendar)]

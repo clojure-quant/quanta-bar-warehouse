@@ -1,11 +1,11 @@
-(ns quanta.bar.db.duck.table
+(ns quanta.bar.db.duck.impl.table
   (:require
    [taoensso.timbre :as timbre :refer [debug info warn error]]
    [tmducken.duckdb :as duckdb]
    [quanta.calendar.db.calendars :refer [get-calendar-list]]
    [quanta.calendar.db.interval :refer [all-intervals]]
-   [quanta.bar.db.duck.calendar :refer [bar-category->table-name]]
-   [quanta.bar.db.duck.ds :refer [empty-ds]]))
+   [quanta.bar.db.duck.impl.calendar :refer [bar-category->table-name]]
+   [quanta.bar.db.duck.impl.ds :refer [empty-ds]]))
 
 (defn make-table-defs [cals intervals]
   (let [make-one-cal (fn [c i]
@@ -26,15 +26,15 @@
         intervals (get-intervals)]
     (make-table-defs cals intervals)))
 
-(defn create-table [session calendar]
+(defn create-table [conn calendar]
   (let [ds (empty-ds calendar)
         table-name (bar-category->table-name calendar)]
     (debug "creating table: " table-name)
-    (duckdb/create-table! (:conn session) ds)))
+    (duckdb/create-table! conn ds)))
 
-(defn init-tables! [session]
+(defn init-tables! [conn]
   (info "init duck-db tables")
-  (doall (map (partial create-table session)
+  (doall (map (partial create-table conn)
               (all-table-defs))))
 
 (comment

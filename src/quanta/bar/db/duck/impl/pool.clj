@@ -1,34 +1,28 @@
-(ns quanta.bar.db.duck.pool
-  (:require 
+(ns quanta.bar.db.duck.impl.pool
+  (:require
    [missionary.core :as m]
-     [tmducken.duckdb :as tmdb]
-   ))
-
-;; You provide these:
-;; (duckdb-connect db)    => conn
-;; (duckdb-disconnect c)  => nil
-;; (duckdb-setup c)       => optional, e.g. (duckdb-exec c "PRAGMA threads=1")
+   [tmducken.duckdb :as tmdb]
+   [quanta.bar.db.duck.impl.admin :refer [set-threads]]))
 
 (defn start-pool-actor
   "Returns {:self mbx :acquire (fn [] task) :release (fn [c] nil) :stop (fn [] nil)}"
-  [{:keys [db size on-create]
-    :or   {size 8 
-           on-create (fn [_] 
-                       (println "conn created")
-                       nil)}}]
-  (let [_ (println "pool actor starting..")
+  [{:keys [db size]
+    :or   {size 8}}]
+  (let [on-create (fn [c]
+                    (set-threads c size)
+                    nil)
+        ;_ (println "pool actor starting..")
         self (m/mbx)
         ;; create connections once
         conns (vec (repeatedly size #(doto (tmdb/connect db) on-create)))
-
         ;; actor loop (runs forever unless you add a :stop protocol)
         _cancel!
         ((m/sp
-          (println "pool-actor loop start! conns: " conns)
+          ;(println "pool-actor loop start! conns: " conns)
           (loop [avail conns
                  waiters clojure.lang.PersistentQueue/EMPTY]
             (let [{:keys [op reply conn]} (m/? self)]
-              (println "processing op: " op)
+              ;(println "processing op: " op " waiting: " (count waiters) " avail: " (count avail))
               (case op
                 :acquire
                 (if (seq avail)
@@ -62,15 +56,16 @@
      :acquire
      (fn []
        (m/sp
-        (println "acquire need")
+        ;(println "acquire need")
         (let [r (m/dfv)]
           (self {:op :acquire :reply r}) ; post message
-          (m/? r))))                     ; wait for assigned conn
+          (m/? r)      ; wait for assigned conn
+          )))               
 
      ;; release is fire-and-forget
      :release
      (fn [c]
-       (println "release conn!")
+       ;(println "release conn!")
        (self {:op :release :conn c})
        nil)
 
@@ -80,3 +75,10 @@
        (self {:op :stop})
        nil)}))
 
+(defmacro with-conn [pool body]
+  `(m/sp
+    (let [~'c (m/? ((:acquire ~pool)))]
+      (try
+        (m/? (m/via m/blk ~body))
+        (finally
+          ((:release ~pool) ~'c))))))

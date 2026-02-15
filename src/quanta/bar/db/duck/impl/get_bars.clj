@@ -1,10 +1,10 @@
-(ns quanta.bar.db.duck.get-bars
+(ns quanta.bar.db.duck.impl.get-bars
   (:require
    [tick.core :as t]
    [tablecloth.api :as tc]
    [tmducken.duckdb :as duckdb]
-   [quanta.bar.db.duck.calendar :refer [bar-category->table-name]]
-   [quanta.bar.db.duck.ds :refer [empty-ds]]))
+   [quanta.bar.db.duck.impl.calendar :refer [bar-category->table-name]]
+   [quanta.bar.db.duck.impl.ds :refer [empty-ds]]))
 
 (defn keywordize-columns [ds]
   (tc/rename-columns

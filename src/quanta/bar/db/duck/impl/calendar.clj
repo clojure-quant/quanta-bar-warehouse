@@ -1,4 +1,4 @@
-(ns quanta.bar.db.duck.calendar)
+(ns quanta.bar.db.duck.impl.calendar)
 
 (defn interval-safe [i]
   ; this is here because duckdb tables dont differentiate

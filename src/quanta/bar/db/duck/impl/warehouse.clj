@@ -1,8 +1,8 @@
-(ns quanta.bar.db.duck.warehouse
+(ns quanta.bar.db.duck.impl.warehouse
   (:require
    [tmducken.duckdb :as duckdb]
    [tablecloth.api :as tc]
-   [quanta.bar.db.duck.calendar :refer [bar-category->table-name]]))
+   [quanta.bar.db.duck.impl.calendar :refer [bar-category->table-name]]))
 
 (defn convert-columns-to-keywords [ds]
   (tc/rename-columns ds (zipmap (tc/column-names ds) (map keyword (tc/column-names ds)))))
@@ -23,16 +23,14 @@
          "from " table-name
          " where asset = '" asset "'")))
 
-(defn get-data-range [session calendar asset]
-  (-> (:conn session)
+(defn get-data-range [conn calendar asset]
+  (-> conn
       (duckdb/sql->dataset
        (sql-query-warehouse-asset calendar asset))
       (tc/set-dataset-name (str "warehouse " calendar " " asset))))
 
-(defn warehouse-summary [session calendar]
-  (let [ds    (duckdb/sql->dataset
-               (:conn session)
-               (sql-query-warehouse calendar))]
+(defn warehouse-summary [conn calendar]
+  (let [ds (duckdb/sql->dataset conn (sql-query-warehouse calendar))]
     (when ds
       (-> ds
           (tc/set-dataset-name (str "warehouse " calendar))
