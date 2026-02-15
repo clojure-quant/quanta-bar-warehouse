@@ -20,3 +20,4 @@ classes
 dev/.clj-kondo/
 dev/.lsp/
 dev/duck-perf/
+dev/*.log

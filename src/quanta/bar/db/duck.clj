@@ -43,18 +43,26 @@
 
 ;; CREATE INDEX s_idx ON films (revenue);
 
+(defn with-new-conn [bardb]
+  (assoc bardb :conn (duckdb/connect (:db bardb))))
+
 (defrecord bardb-duck [db conn new? lock]
   barsource
   (get-bars [this opts window]
-    (m/sp
-     (m/holding
-      lock
-      (let [; allow to pass in a calendar/window which does not have :start :end
-            window (if (:window window)
-                     (window->close-range window)
-                     window)]
-        (debug "get-bars " (select-keys opts [:asset :calendar]) window)
-        (m/? (m/via m/blk (get-bars this opts window)))))))
+            (println "get-bars outside thread: " (.getId (Thread/currentThread)))
+            (m/via m/blk
+                   (m/holding
+                    lock
+                    (let [; allow to pass in a calendar/window which does not have :start :end
+                          _ (println "get-bars inside thread: " (.getId (Thread/currentThread)))
+                          window (if (:window window)
+                                   (window->close-range window)
+                                   window)
+                          bds (quanta.bar.db.duck.get-bars/get-bars (with-new-conn this) opts window)
+                          ]
+                      (println "BDS: " bds)
+                      bds
+                      ))))
   bardb
   (append-bars [this opts ds-bars]
     (m/via m/blk (m/holding lock (append-bars  this opts ds-bars))))

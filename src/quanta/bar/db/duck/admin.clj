@@ -8,3 +8,5 @@
 (defn db-size [session]
   (duckdb/sql->dataset (:conn session) "PRAGMA database_size;"))
 
+(defn query [session sql]
+  (duckdb/sql->dataset  (:conn session) sql))

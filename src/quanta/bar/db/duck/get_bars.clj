@@ -117,6 +117,7 @@
 
         :else
         bar-ds))
-    (catch Exception _ex
+    (catch Exception ex
       (throw (ex-info "get-bars duckdb" {:window window
-                                         :opts opts})))))
+                                         :opts opts
+                                         :ex ex})))))
