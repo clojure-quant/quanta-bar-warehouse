@@ -14,6 +14,7 @@
 (def pool-1 (start-pool-actor {:db (:db db) :size 1}))
 (def pool-8 (start-pool-actor {:db (:db db) :size 8}))
 (def pool-16 (start-pool-actor {:db (:db db) :size 16}))
+(def pool-32 (start-pool-actor {:db (:db db) :size 32}))
 
 (m/?
  (with-conn pool-1
@@ -26,16 +27,6 @@
 (m/?
  (with-conn pool-1
    (a/db-size c)))
-
-
-
-(m/?
- (with-conn pool-1
-   (a/query c "PRAGMA database_size;")))
-
-(m/?
- (with-conn pool-1
-   (a/run! c "CHECKPOINT;")))
 
 (m/?
  (with-conn pool-8
@@ -56,52 +47,40 @@
  (m/?  (m/join vector
                (get-asset-barcount pool-1 3)
                (get-asset-barcount pool-1 44)
-               (get-asset-barcount pool-1 4)
-               )))
+               (get-asset-barcount pool-1 4))))
 
 (time
  (m/?
   (with-conn pool-1
     (a/query c "SELECT asset, date, close
                FROM us_d"))))
-; "Elapsed time: 50.935172 msecs"
-
-(time
- (print-table
-  (m/?  (apply m/join vector
-               (repeatedly 1000 #(get-asset-barcount pool-8 (rand-int 50)))))))
-; "Elapsed time: 1126.139369 msecs"
-
-(time
- (print-table
-  (m/?  (apply m/join vector
-               (repeatedly 1000 #(get-asset-barcount pool-16 (rand-int 50)))))))
-; "Elapsed time: 1135.317616 msecs"
+; "Elapsed time: 24.678444 msecs"
+; :_unnamed [263000 3]:
 
 (time
  (print-table
   (m/?  (apply m/join vector
                (repeatedly 1000 #(get-asset-barcount pool-1 (rand-int 50)))))))
-; "Elapsed time: 4508.965647 msecs"
+; "Elapsed time: 3615.025999 msecs"
 
-(try
-  (m/?
-   (m/sp
-    (let [c (m/? ((:acquire pool)))]
-      (try
-        (println "rcvd conn: " c)
-        (let [bar-ds (get-bars c {:asset "BONGO"} {:calendar [:us :d]})]
-          (println "bars rcvd: " bar-ds))
-        (finally
-          (println "release conn after bars rcvd.")
-          ((:release pool) c))))))
-  (catch Exception ex
-    (println "ex: " ex)
-    (println "ex-cause: " (ex-cause ex))
-    (println "ex-data: " (ex-data ex))))
+(time
+ (print-table
+  (m/?  (apply m/join vector
+               (repeatedly 1000 #(get-asset-barcount pool-8 (rand-int 50)))))))
+; "Elapsed time: 570.228022 msecs"
 
-(macroexpand
- '(with-conn pool
-    (get-bars c {:asset "BONGO"} {:calendar [:us :d]})))
- 
+(time
+ (print-table
+  (m/?  (apply m/join vector
+               (repeatedly 1000 #(get-asset-barcount pool-16 (rand-int 50)))))))
+; "Elapsed time: 485.088076 msecs"
+
+(time
+ (print-table
+  (m/?  (apply m/join vector
+               (repeatedly 1000 #(get-asset-barcount pool-32 (rand-int 50)))))))
+; "Elapsed time: 535.909929 msecs"
+
+
+
 

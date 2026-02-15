@@ -2,16 +2,16 @@
   (:require
    [taoensso.timbre :as timbre :refer [debug info error]]
    [clojure.java.io :as java-io]
-   [missionary.core :as m]
    [babashka.fs :as fs]
    [tmducken.duckdb :as duckdb]
    [quanta.calendar.window :refer [window->close-range]]
    [quanta.bar.protocol :refer [bardb barsource]]
-   [quanta.bar.db.duck.get-bars :refer [get-bars]]
-   [quanta.bar.db.duck.append-bars :refer [append-bars]]
-   [quanta.bar.db.duck.delete :refer [delete-bars]]
-   [quanta.bar.db.duck.warehouse :refer [warehouse-summary]]
-   [quanta.bar.db.duck.table :refer [init-tables!]]))
+   [quanta.bar.db.duck.impl.pool :refer [start-pool-actor with-conn]]
+   [quanta.bar.db.duck.impl.get-bars :refer [get-bars]]
+   [quanta.bar.db.duck.impl.append-bars :refer [append-bars]]
+   [quanta.bar.db.duck.impl.delete :refer [delete-bars]]
+   [quanta.bar.db.duck.impl.warehouse :refer [warehouse-summary]]
+   [quanta.bar.db.duck.impl.table :refer [init-tables!]]))
 
 ;; https://github.com/techascent/tmducken
 
@@ -32,6 +32,7 @@
           conn (duckdb/connect db)]
       {:db db
        :conn conn
+       :pool (start-pool-actor {:db db :size 8})
        :new? new?})))
 
 (defn- duckdb-stop-impl [{:keys [conn] :as session}]
@@ -41,46 +42,25 @@
     (catch Exception ex
       (error "duck-db stop exception: " (ex-message ex)))))
 
-;; CREATE INDEX s_idx ON films (revenue);
-
-(defn with-new-conn [bardb]
-  (assoc bardb :conn (duckdb/connect (:db bardb))))
-
-(defrecord bardb-duck [db conn new? lock]
+(defrecord bardb-duck [db conn new? pool]
   barsource
-  (get-bars [this opts window]
-            (println "get-bars outside thread: " (.getId (Thread/currentThread)))
-            (m/via m/blk
-                   (m/holding
-                    lock
-                    (let [; allow to pass in a calendar/window which does not have :start :end
-                          _ (println "get-bars inside thread: " (.getId (Thread/currentThread)))
-                          window (if (:window window)
-                                   (window->close-range window)
-                                   window)
-                          bds (quanta.bar.db.duck.get-bars/get-bars (with-new-conn this) opts window)
-                          ]
-                      (println "BDS: " bds)
-                      bds
-                      ))))
+  (get-bars [_ opts window]
+    (let [; allow to pass in a calendar/window which does not have :start :end
+          window (if (:window window) (window->close-range window) window)]
+      (with-conn pool (get-bars c opts window))))
   bardb
-  (append-bars [this opts ds-bars]
-    (m/via m/blk (m/holding lock (append-bars  this opts ds-bars))))
-  (delete-bars [this opts]
-    (m/via m/blk
-           (m/holding lock
-                      (delete-bars this (:calendar opts) (:asset opts)))))
-  (summary [this opts]
-    (m/via m/blk
-           (m/holding lock
-                      (warehouse-summary this (:calendar opts))))))
+  (append-bars [_ opts bar-ds]
+    (with-conn pool (append-bars c opts bar-ds)))
+  (delete-bars [_ opts]
+    (with-conn pool (delete-bars c (:calendar opts) (:asset opts))))
+  (summary [_ opts]
+    (with-conn pool (warehouse-summary c (:calendar opts)))))
 
 (defn start-bardb-duck [opts]
-  (let [{:keys [db conn new?] :as this} (duckdb-start-impl opts)
-        lock (m/sem)]
+  (let [{:keys [db conn new? pool]} (duckdb-start-impl opts)]
     (when new?
-      (init-tables! this))
-    (bardb-duck. db conn new? lock)))
+      (init-tables! conn))
+    (bardb-duck. db conn new? pool)))
 
 (defn stop-bardb-duck [state]
   (duckdb-stop-impl state))

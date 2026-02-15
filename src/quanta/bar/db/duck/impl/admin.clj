@@ -14,7 +14,7 @@
 (defn query [conn sql]
   (duckdb/sql->dataset conn sql))
 
-(defn run! [conn sql]
+(defn exec! [conn sql]
   (duckdb/run-query! conn sql))
 
-  
+

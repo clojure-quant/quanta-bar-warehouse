@@ -68,10 +68,10 @@
     (throw (ex-info ":seed is required" {})))
   (random-bar-source. (long seed) zero-date (double zero-price)))
 (comment
-  
+
   (-> (seed-for-asset-calendar 5 "MOF" [:us :d])
       (Random.))
-  
+
   (generate-series {:seed 501
                     :zero-date (t/instant "2000-01-01T00:00:00Z")
                     :zero-price 100.0

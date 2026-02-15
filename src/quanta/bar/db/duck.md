@@ -71,3 +71,70 @@ ORDER BY asset, date;
 DROP TABLE prices_main;
 ALTER TABLE prices_main2 RENAME TO prices_main;
 TRUNCATE prices_delta;
+
+# UNIQUE ASSET/BAR 
+
+CREATE TABLE bars (
+  asset_id INTEGER,
+  ts TIMESTAMP,
+  open DOUBLE,
+  high DOUBLE,
+  low DOUBLE,
+  close DOUBLE,
+  volume BIGINT,
+  PRIMARY KEY(asset_id, ts)
+);
+
+PRIMARY KEY(asset_id, ts)
++ INSERT … ON CONFLICT DO UPDATE
+
+# INSERT FORGETS DUPLICATES; keep old
+
+INSERT INTO bars VALUES (...)
+ON CONFLICT(asset_id, ts) DO NOTHING;
+If a row with the same key exists, the insert is skipped.
+
+# INSERT keeps new (upsert)
+
+INSERT INTO bars AS b
+VALUES (...)
+ON CONFLICT(asset_id, ts) DO UPDATE SET
+  open   = excluded.open,
+  high   = excluded.high,
+  low    = excluded.low,
+  close  = excluded.close,
+  volume = excluded.volume;
+
+ # A simple tuning starting point (works well in practice)
+
+If your workload is many asset-by-asset computations (signals/backtests), start here:
+pool size = #cores
+per connection: PRAGMA threads=1;
+data layout:
+clustered by (asset_id, ts)
+ingest:
+appender → staging → merge
+This combination is “boring” but very hard to beat.
+
+# Ingest strategy (this is usually where people lose 10×)
+Best practice
+
+Batch inserts (big chunks) instead of row-by-row.
+
+Use the C API’s appender if possible (it’s designed for high-throughput ingest).
+
+Land raw data into a staging table, then MERGE/upsert into the main clustered table.
+
+Practical pattern
+
+Append into bars_staging fast
+
+MERGE into bars
+
+Truncate staging
+
+This keeps your main table clean and reduces fragmentation.
+
+# index ??
+
+;; CREATE INDEX s_idx ON films (revenue);

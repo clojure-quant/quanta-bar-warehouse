@@ -5,7 +5,7 @@
    [tech.v3.dataset :as tds]
    [tablecloth.api :as tc]
    [quanta.calendar.window :as w]
-   [quanta.bar.protocol :as b] 
+   [quanta.bar.protocol :as b]
    [quanta.bar.db.duck.warehouse :as wh]
    [dev.env :refer [bardbduck]]))
 

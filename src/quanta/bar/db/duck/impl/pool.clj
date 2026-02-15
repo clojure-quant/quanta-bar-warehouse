@@ -30,7 +30,7 @@
                     (reply (peek avail))              ; dfv assign (1-arity)
                     (recur (pop avail) waiters))
                   (recur avail (conj waiters reply))) ; queue the dfv
-                
+
                 :release
                 (if (seq waiters)
                   (let [w (peek waiters)]
@@ -60,7 +60,7 @@
         (let [r (m/dfv)]
           (self {:op :acquire :reply r}) ; post message
           (m/? r)      ; wait for assigned conn
-          )))               
+          )))
 
      ;; release is fire-and-forget
      :release
