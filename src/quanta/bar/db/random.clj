@@ -30,7 +30,7 @@
                    (reverse)
                    (into []))
         seed-asset (seed-for-asset-calendar seed asset calendar)
-        rng (Random. (long seed-asset))
+        rng (Random. seed-asset)
         rets (for [_i (range (count dates))]
                (daily-return rng))
         prices (reductions * zero-price rets)]

@@ -1,10 +1,33 @@
 (ns quanta.bar.db.duck.impl.get-bars
   (:require
+   [clojure.string]
    [tick.core :as t]
    [tablecloth.api :as tc]
    [tmducken.duckdb :as duckdb]
    [quanta.bar.db.duck.impl.calendar :refer [bar-category->table-name]]
    [quanta.bar.db.duck.impl.ds :refer [empty-ds]]))
+
+;; SQL  helper
+
+(defn sql-select-table [calendar]
+  (let [table-name (bar-category->table-name calendar)]
+    (str "SELECT * from " table-name)))
+
+(defn sql-where-asset [asset multiple?]
+  (if multiple?
+    (str " WHERE asset IN ("
+         (clojure.string/join "," (map #(str "'" % "'") asset))
+         ")")
+    (str " WHERE asset = '" asset "'")))
+
+(defn sql-date-since [since]
+  (str " and date >= '" since "'"))
+
+(defn sql-date-until [until]
+  (str " and date <= '" until "'"))
+
+(defn sql-date-range [dstart dend]
+  (str " and date >= '" dstart "' and date <= '" dend "'"))
 
 (defn keywordize-columns [ds]
   (tc/rename-columns
@@ -18,65 +41,75 @@
     "asset" :asset
     "ticks" :ticks}))
 
-(defn sql-query-bars-for-asset [calendar asset]
-  (let [table-name (bar-category->table-name calendar)]
-    (str "select * from " table-name " where asset = '" asset "' order by date")))
+(defn bar-query [conn sql]
+  (-> (duckdb/sql->dataset conn sql)
+      (keywordize-columns)))
+
+(defn asset-multiple? [asset]
+  ;(or (vector? asset) (seq? asset) (set? asset))
+  (vector? asset))
+
+;; full sql/queries
+
+(defn sql-bars-full [calendar asset multiple?]
+  (str (sql-select-table calendar)
+       (sql-where-asset asset multiple?)
+       (if multiple? "" " order by date")))
 
 (defn get-bars-full [conn calendar asset]
-  (let [query (sql-query-bars-for-asset calendar asset)]
-    (-> (duckdb/sql->dataset conn query)
-        (keywordize-columns))))
+  (let [multiple? (asset-multiple? asset)]
+    (bar-query conn (sql-bars-full calendar asset multiple?))))
 
-(defn sql-query-bars-for-asset-since [calendar asset since]
-  (let [table-name (bar-category->table-name calendar)]
-    (str "select * from " table-name
-         " where asset = '" asset "'"
-         " and date > '" since "'"
-         " order by date")))
+(defn sql-bars-window [calendar asset multiple? dstart dend]
+  (str (sql-select-table calendar)
+       (sql-where-asset asset multiple?)
+       (sql-date-range dstart dend)
+       (if multiple? "" " order by date")))
+
+(defn get-bars-window [conn calendar asset dstart dend]
+  (let [multiple? (asset-multiple? asset)]
+    (bar-query conn (sql-bars-window calendar asset multiple? dstart dend))))
+
+(defn sql-bars-since [calendar asset multiple? since]
+  (str (sql-select-table calendar)
+       (sql-where-asset asset multiple?)
+       (sql-date-since since)
+       (if multiple? "" " order by date")))
 
 (defn get-bars-since [conn calendar asset since]
-  (let [query (sql-query-bars-for-asset-since calendar asset since)]
-    (-> (duckdb/sql->dataset conn query)
-        (keywordize-columns))))
+  (let [multiple? (asset-multiple? asset)]
+    (bar-query conn (sql-bars-since calendar asset multiple? since))))
 
-(defn sql-query-bars-for-asset-until
-  ([calendar asset until]
-   (let [table-name (bar-category->table-name calendar)]
-     (str "select * from " table-name
-          " where asset = '" asset "'"
-          " and date <= '" until "'"
-          " order by date")))
-  ([calendar asset until n]
-   (let [table-name (bar-category->table-name calendar)]
-     (str "select * from " table-name
-          " where asset = '" asset "'"
-          " and date <= '" until "'"
-          " order by date desc"
-          " limit " n))))
+;; UNTIL 
+
+(defn sql-bars-until [calendar asset multiple? until]
+  (str (sql-select-table calendar)
+       (sql-where-asset asset multiple?)
+       (sql-date-until until)
+       (if multiple? "" " order by date")))
+
+(defn sql-bars-until-n [calendar asset multiple? until n]
+    ; this does only support single asset.
+  (str (sql-select-table calendar)
+       (sql-where-asset asset multiple?)
+       (sql-date-until until)
+       " order by date desc"
+       " limit " n))
 
 (defn get-bars-until
   ([conn calendar asset until]
-   (let [query (sql-query-bars-for-asset-until calendar asset until)]
-     (-> (duckdb/sql->dataset conn query)
-         (keywordize-columns))))
+   (let [multiple? (asset-multiple? asset)]
+     (bar-query conn (sql-bars-until calendar asset multiple? until))))
   ([conn calendar asset until n]
-   (let [query (sql-query-bars-for-asset-until calendar asset until n)]
-     (-> (duckdb/sql->dataset conn query)
-         (keywordize-columns)
+   (if (asset-multiple? asset)
+     (throw (ex-info "get-bars-until [n] only supports single asset!" {:calendar calendar
+                                                                       :asset asset
+                                                                       :until until
+                                                                       :n n}))
+     (-> (bar-query conn (sql-bars-until-n calendar asset false until n))
          (tc/order-by :date)))))
 
-(defn sql-query-bars-for-asset-window [calendar asset dstart dend]
-  (let [table-name (bar-category->table-name calendar)]
-    (str "select * from " table-name
-         " where asset = '" asset "'"
-         " and date >= '" dstart "'"
-         " and date <= '" dend "'"
-         " order by date")))
-
-(defn get-bars-window [conn calendar asset dstart dend]
-  (let [query (sql-query-bars-for-asset-window calendar asset dstart dend)]
-    (-> (duckdb/sql->dataset conn query)
-        (keywordize-columns))))
+; 
 
 (defn ensure-instant [dt]
   (when dt
@@ -93,22 +126,23 @@
           end (ensure-instant end)
           calendar (or calendar (:calendar opts))
           bar-ds (cond
-                   ; start-end window
+                   ; window - start-end 
                    (and start end)
                    (get-bars-window conn calendar asset start end)
 
-                   ; starting >>
+                   ; since - starting >>
                    start
                    (get-bars-since conn calendar asset start)
 
-; end 
+                    ; until -limit end 
                    (and end n)
                    (get-bars-until conn calendar asset end n)
 
+                     ; until full
                    end
                    (get-bars-until conn calendar asset end)
 
-                   ; entire history
+                   ; full - entire history
                    :else
                    (get-bars-full conn calendar asset))]
       (cond
