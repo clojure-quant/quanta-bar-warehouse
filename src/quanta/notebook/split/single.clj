@@ -1,4 +1,4 @@
-(ns dev.split.single
+(ns quanta.notebook.split.single
   (:require
    [tick.core :as t]
    [tablecloth.api :as tc]

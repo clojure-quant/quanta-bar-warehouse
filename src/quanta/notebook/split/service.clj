@@ -1,4 +1,4 @@
-(ns dev.split.service
+(ns quanta.notebook.split.service
   (:require
    [tick.core :as t]
    [missionary.core :as m]
@@ -7,7 +7,10 @@
    [quanta.calendar.window :as w]
    [quanta.bar.protocol :as b]
    [quanta.bar.split.service :refer [save-splits delete-splits get-splits]]
-   [dev.env :refer [ss bardbduck]]))
+   [modular.system :refer [system]]))
+
+(def ss (:ss system))
+(def bardbduck (:bar-db-duck system))
 
 (def split-ds
   (-> {:date [(t/instant "1987-09-21T00:00:00Z")
