@@ -53,8 +53,8 @@
     (with-conn pool (append-bars c opts bar-ds)))
   (delete-bars [_ opts]
     (with-conn pool (delete-bars c (:calendar opts) (:asset opts))))
-  (summary [_ opts]
-    (with-conn pool (warehouse-summary c (:calendar opts)))))
+  (summary [_ {:keys [calendar]}]
+           (with-conn pool (warehouse-summary c calendar))))
 
 (defn start-bardb-duck [opts]
   (let [{:keys [db conn new? pool]} (duckdb-start-impl opts)]

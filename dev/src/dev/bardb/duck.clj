@@ -6,7 +6,6 @@
    [tablecloth.api :as tc]
    [quanta.calendar.window :as w]
    [quanta.bar.protocol :as b]
-   [quanta.bar.db.duck.warehouse :as wh]
    [dev.env :refer [bardbduck]]))
 
 (def stocks
@@ -42,7 +41,7 @@
                                :calendar [:us :d]}
                     stocks-import))
 
-(wh/warehouse-summary bardbduck [:us :d])
+(m/? (b/summary bardbduck {:calendar [:us :d]}))
 
 (m/? (b/get-bars bardbduck
                  {:asset "GOOG"}
