@@ -106,8 +106,10 @@
                                                                        :asset asset
                                                                        :until until
                                                                        :n n}))
-     (-> (bar-query conn (sql-bars-until-n calendar asset false until n))
-         (tc/order-by :date)))))
+     (let [ds (bar-query conn (sql-bars-until-n calendar asset false until n))]
+       (if (= 0 (tc/row-count ds))
+         (throw (ex-info "empty-bars" {:asset asset :calendar calendar :n n :dt until})))
+       (tc/order-by ds :date)))))
 
 ; 
 
