@@ -6,7 +6,10 @@
    [tablecloth.api :as tc]
    [quanta.calendar.window :as w]
    [quanta.bar.protocol :as b]
-   [dev.env :refer [bardbduck]]))
+   [modular.system :refer [system]]))
+
+(def bardbduck (:bar-db-duck system))
+
 
 (def stocks
   (tds/->dataset "https://github.com/techascent/tech.ml.dataset/raw/master/test/data/stocks.csv"
@@ -43,11 +46,14 @@
 
 (m/? (b/summary bardbduck {:calendar [:us :d]}))
 
-(m/? (b/get-bars bardbduck
-                 {:asset "GOOG"}
-                 (w/date-range->window [:us :d]
-                                       {:start (t/instant "2005-01-01T00:00:00Z")
-                                        :end (t/instant "2010-03-01T20:00:00Z")})))
+(m/? 
+ (b/get-bars bardbduck
+     {:asset "GOOG"}
+     (w/date-range->window [:us :d]
+                           {:start (t/instant "2005-01-01T00:00:00Z")
+                            :end (t/instant "2010-03-01T20:00:00Z")})
+             
+             ))
 
 (m/? (b/get-bars bardbduck
                  {:asset "GOOG"

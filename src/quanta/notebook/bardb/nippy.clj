@@ -6,7 +6,10 @@
    [quanta.bar.protocol :as b]
    [quanta.bar.db.nippy.overview :refer [create-summary]]
    [quanta.bar.db.nippy :refer [summary-nippy]]
-   [dev.env :refer [bardbnippy]]))
+   [modular.system :refer [system]]
+   ))
+
+(def bardbnippy (:bar-db-nippy system))
 
 (def qqq (m/? (b/get-bars bardbnippy {:asset "QQQ" :calendar [:us :d]} {})))
 (def spy (m/? (b/get-bars bardbnippy {:asset "SPY" :calendar [:us :d]} {})))
