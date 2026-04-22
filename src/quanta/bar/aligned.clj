@@ -7,12 +7,11 @@
    [ta.calendar.align :as align]
    [quanta.bar.protocol :as b]))
 
-;; TODO: remove this. 
-;; it came from quanta-market. and  it is only used in algo-env.
-;; once our bar-dbs are more stable, we dont need a hack.
+;; used in quanta.bar.env
 
 (defn- hack-at-time [date]
-  ; TODO: remove this hack
+  ;; TODO: remove this hack
+  ;; once our bar-dbs are more stable, we dont need a hack.
   ;(info "hacking date: " date)
   (-> date
       (t/date)
