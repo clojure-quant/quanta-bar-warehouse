@@ -1,4 +1,4 @@
-(ns dev.bardb.duck
+(ns quanta.notebook.bardb.duck
   (:require
    [tick.core :as t]
    [missionary.core :as m]
