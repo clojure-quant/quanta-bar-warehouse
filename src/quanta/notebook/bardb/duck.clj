@@ -10,7 +10,6 @@
 
 (def bardbduck (:bar-db-duck system))
 
-
 (def stocks
   (tds/->dataset "https://github.com/techascent/tech.ml.dataset/raw/master/test/data/stocks.csv"
                  {:key-fn keyword
@@ -46,14 +45,12 @@
 
 (m/? (b/summary bardbduck {:calendar [:us :d]}))
 
-(m/? 
+(m/?
  (b/get-bars bardbduck
-     {:asset "GOOG"}
-     (w/date-range->window [:us :d]
-                           {:start (t/instant "2005-01-01T00:00:00Z")
-                            :end (t/instant "2010-03-01T20:00:00Z")})
-             
-             ))
+             {:asset "GOOG"}
+             (w/date-range->window [:us :d]
+                                   {:start (t/instant "2005-01-01T00:00:00Z")
+                                    :end (t/instant "2010-03-01T20:00:00Z")})))
 
 (m/? (b/get-bars bardbduck
                  {:asset "GOOG"

@@ -6,8 +6,7 @@
    [quanta.bar.protocol :as b]
    [quanta.bar.db.nippy.overview :refer [create-summary]]
    [quanta.bar.db.nippy :refer [summary-nippy]]
-   [modular.system :refer [system]]
-   ))
+   [modular.system :refer [system]]))
 
 (def bardbnippy (:bar-db-nippy system))
 
