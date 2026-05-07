@@ -93,11 +93,11 @@
              :import :kibot}
             {})
 
-(wh/warehouse-summary bardbduck [:us :d])
+(b/summary bardbduck [:us :d])
 
 (m/? (b/delete-bars bardbduck {:asset "AMZN"
                                :calendar [:us :d]}))
 
-(wh/warehouse-summary bardbduck [:us :d])
+(b/summary bardbduck [:us :d])
 
 

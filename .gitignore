@@ -21,3 +21,13 @@ dev/.clj-kondo/
 dev/.lsp/
 dev/duck-perf/
 dev/*.log
+.gorilla/
+demo-studio/.gorilla/
+demo-studio/.reval/
+demo-studio/.shadow-cljs
+demo-studio/node_modules/
+demo-studio/.flowy/
+demo-studio/package.json
+demo-studio/package-lock.json
+demo-studio/karma.conf.js
+demo-studio/shadow-cljs.edn

@@ -8,8 +8,7 @@
   com.techascent/tmducken {:mvn/version "0.10.1-01"}
   org.pinkgorilla/timbre {:mvn/version "0.0.8"}
   ; quanta
-  io.github.clojure-quant/quanta-calendar {:mvn/version "0.6.29"} ; to create duckdb schema, scheduler
-
+  io.github.clojure-quant/quanta-calendar {:mvn/version "0.6.31"} ; to create duckdb schema, scheduler
   }
  :aliases
  {:test {:extra-paths ["test"]
@@ -25,7 +24,7 @@
                "--lint"
                "./src/quanta"]}
 
-   :eastwood
+  :eastwood
   {:main-opts ["-m"
                "eastwood.lint"
                      ;; Any Eastwood options can be passed here as edn:

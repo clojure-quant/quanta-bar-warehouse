@@ -1,6 +1,5 @@
 (ns quanta.notebook.bardb.nippy
   (:require
-   [tick.core :as t]
    [missionary.core :as m]
    [tablecloth.api :as tc]
    [quanta.bar.protocol :as b]

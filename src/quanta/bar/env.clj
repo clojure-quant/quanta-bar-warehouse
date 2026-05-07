@@ -2,12 +2,10 @@
   (:require
    [taoensso.timbre :refer [trace info warn error]]
    [missionary.core :as m]
-   [de.otto.nom.core :as nom]
    [tablecloth.api :as tc]
    [quanta.calendar.window :as w]
    [quanta.calendar.interval :as i]
-   [quanta.bar.protocol :as b]
-   [quanta.bar.aligned :as aligned]))
+   [quanta.bar.protocol :as b]))
 
 (defn get-bar-db [env]
   (let [bar-db (:bar-db env)]
@@ -28,14 +26,6 @@
     (assert asset "cannot get-bars for unknown asset!")
     (assert window "cannot get-bars for unknown window!")
     (b/get-bars (get-bar-db env) opts window)))
-
-(defn get-bars-aligned-filled
-  "returns bars for asset/calendar/window"
-  [env {:keys [asset calendar] :as opts} calendar-seq]
-  (assert asset "cannot get-bars for unknown asset!")
-  (assert calendar "cannot get-bars for unknown calendar!")
-  (assert calendar-seq "cannot get-bars-aligned for unknown window!")
-  (aligned/get-bars-aligned-filled (get-bar-db env) opts calendar-seq))
 
 (defn get-trailing-bars [env {:keys [trailing-n] :as opts} last-interval]
   (info "get-trailing" trailing-n " bars ending: " (-> last-interval i/current :close))
@@ -78,25 +68,5 @@
       (get-bars {:asset asset
                  :calendar calendar-lower} window)))
 
-(defn get-multiple-bars [env {:keys [assets] :as opts} cal-seq]
-  (let [get-bars (fn [asset]
-                   (info "loading: " asset)
-                   (-> (get-bars-aligned-filled env (assoc opts :asset asset) cal-seq)
-                       (tc/add-column :asset asset)))
-        asset-map-seq (map (fn [asset]
-                             {:asset asset
-                              :bars (get-bars asset)}) assets)
-        assets-bad (->> (filter #(nom/anomaly? (:bars %)) asset-map-seq)
-                        (map :asset))
-        assets-good (->> (remove #(nom/anomaly? (:bars %)) asset-map-seq)
-                         (map :asset))
-        bars-good (->> (remove #(nom/anomaly? (:bars %)) asset-map-seq)
-                       (map :bars))]
-    {:bad assets-bad
-     :good assets-good
-     :bars bars-good}))
 
-(defn get-multiple-bars-trailing [env {:keys [_calendar _assets trailing-n] :as opts} last-interval]
-  (let [window (w/window-extend-left last-interval trailing-n)]
-    (get-multiple-bars env opts window)))
 

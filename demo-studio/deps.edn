@@ -1,0 +1,19 @@
+{:paths ["src"
+         "resources"
+         ".reval"]
+ :deps {;io.github.clojure-quant/quanta-studio2 {:local/root "../studio" :deps/manifest :deps}
+        io.github.clojure-quant/quanta-studio {:mvn/version "0.5.9"}
+        io.github.clojure-quant/quanta-bar-warehouse {:local/root ".." :deps/manifest :deps}}
+
+ :aliases {:npm-install {:exec-fn webly.spa/webly-build
+                         :exec-args {:config ["quanta/studio-config.edn"
+                                              "${MYVAULT}/quanta.edn"]
+                                     :profile "npm-install"}}
+
+           :watch {:exec-fn modular.system/start!
+                   :exec-args {:profile "watch"
+                               :config  ["quanta/studio-config.edn"
+                                         "${MYVAULT}/quanta.edn"]
+                               :services "quanta/studio-services.edn"}}}
+ ;
+ }
