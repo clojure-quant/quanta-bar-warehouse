@@ -4,7 +4,7 @@
    [de.otto.nom.core :as nom]
    [tech.v3.datatype.functional :as dfn]
    [tablecloth.api :as tc]
-   [ta.indicator.returns :refer [forward-shift-col]]
+   [quanta.indicator.returns :refer [forward-shift-col]]
    [quanta.bar.protocol :refer [barsource] :as b]))
 
 (defn shuffle-bar-series [ds]
